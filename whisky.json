@@ -1,0 +1,10 @@
+{
+  "disabled": [],
+  "hooks": {
+    "pre-commit": [
+      "./vendor/bin/rector process --no-ansi",
+      "./vendor/bin/pint --dirty --no-ansi",
+      "npx eslint . --fix"
+    ]
+  }
+}
