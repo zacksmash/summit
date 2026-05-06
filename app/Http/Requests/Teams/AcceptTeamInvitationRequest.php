@@ -23,6 +23,7 @@ class AcceptTeamInvitationRequest extends FormRequest
     /**
      * Get the validation data from the request.
      */
+    #[\Override]
     public function validationData(): array
     {
         return array_merge(parent::validationData(), [

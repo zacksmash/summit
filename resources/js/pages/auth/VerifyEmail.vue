@@ -20,7 +20,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Email verification" />
+    <Head title="Email verification"/>
 
     <div
         v-if="status === 'verification-link-sent'"
@@ -31,16 +31,20 @@ defineProps<{
     </div>
 
     <Form
+        v-slot="{ processing }"
         v-bind="send.form()"
         class="space-y-6 text-center"
-        v-slot="{ processing }"
     >
         <Button :disabled="processing" variant="secondary">
-            <Spinner v-if="processing" />
+            <Spinner v-if="processing"/>
             Resend verification email
         </Button>
 
-        <TextLink :href="logout()" as="button" class="mx-auto block text-sm">
+        <TextLink
+            :href="logout()"
+            as="button"
+            class="mx-auto block text-sm"
+        >
             Log out
         </TextLink>
     </Form>

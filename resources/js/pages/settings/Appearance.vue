@@ -17,7 +17,7 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="Appearance settings" />
+    <Head title="Appearance settings"/>
 
     <h1 class="sr-only">Appearance settings</h1>
 
@@ -27,6 +27,6 @@ defineOptions({
             title="Appearance settings"
             description="Update your account's appearance settings"
         />
-        <AppearanceTabs />
+        <AppearanceTabs/>
     </div>
 </template>

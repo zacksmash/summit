@@ -95,21 +95,32 @@ onUnmounted(() => {
                 :class="
                     props.inHeader
                         ? 'h-8 gap-1 px-2'
-                        : 'w-full justify-start px-2 has-[>svg]:px-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+                        : `
+                          w-full justify-start px-2
+                          has-[>svg]:px-2
+                          data-[state=open]:bg-sidebar-accent
+                          data-[state=open]:text-sidebar-accent-foreground
+                        `
                 "
             >
                 <Users
                     :class="
                         props.inHeader
                             ? 'hidden'
-                            : 'hidden size-4 shrink-0 group-data-[collapsible=icon]:block'
+                            : `
+                              hidden size-4 shrink-0
+                              group-data-[collapsible=icon]:block
+                            `
                     "
                 />
                 <div
                     :class="
                         props.inHeader
-                            ? 'grid flex-1 text-left text-sm leading-tight'
-                            : 'grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden'
+                            ? 'grid flex-1 text-left text-sm/tight'
+                            : `
+                              grid flex-1 text-left text-sm/tight
+                              group-data-[collapsible=icon]:hidden
+                            `
                     "
                 >
                     <span
@@ -126,7 +137,10 @@ onUnmounted(() => {
                     :class="
                         props.inHeader
                             ? 'size-4 opacity-50'
-                            : 'ml-auto group-data-[collapsible=icon]:hidden'
+                            : `
+                              ml-auto
+                              group-data-[collapsible=icon]:hidden
+                            `
                     "
                 />
             </Button>
@@ -154,14 +168,14 @@ onUnmounted(() => {
                     :class="checkIconClass"
                 />
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator/>
             <CreateTeamModal>
                 <DropdownMenuItem
                     data-test="team-switcher-new-team"
                     :class="teamItemClass"
                     @select.prevent
                 >
-                    <Plus :class="plusIconClass" />
+                    <Plus :class="plusIconClass"/>
                     <span class="text-muted-foreground">New team</span>
                 </DropdownMenuItem>
             </CreateTeamModal>

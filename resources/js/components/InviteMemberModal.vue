@@ -54,8 +54,8 @@ function handleOpenChange(value: boolean) {
             <Form
                 :key="formKey"
                 v-bind="storeInvitation.form(props.team.slug)"
-                class="space-y-6"
                 v-slot="{ errors, processing }"
+                class="space-y-6"
                 @success="emit('update:open', false)"
             >
                 <DialogHeader>
@@ -76,7 +76,7 @@ function handleOpenChange(value: boolean) {
                             placeholder="colleague@example.com"
                             required
                         />
-                        <InputError :message="errors.email" />
+                        <InputError :message="errors.email"/>
                     </div>
 
                     <div class="grid gap-2">
@@ -87,7 +87,7 @@ function handleOpenChange(value: boolean) {
                             data-test="invite-role"
                         >
                             <SelectTrigger class="w-full">
-                                <SelectValue placeholder="Select a role" />
+                                <SelectValue placeholder="Select a role"/>
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem
@@ -99,7 +99,7 @@ function handleOpenChange(value: boolean) {
                                 </SelectItem>
                             </SelectContent>
                         </Select>
-                        <InputError :message="errors.role" />
+                        <InputError :message="errors.role"/>
                     </div>
                 </div>
 

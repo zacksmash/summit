@@ -34,7 +34,7 @@ const user = computed(() => page.props.auth.user);
 </script>
 
 <template>
-    <Head title="Profile settings" />
+    <Head title="Profile settings"/>
 
     <h1 class="sr-only">Profile settings</h1>
 
@@ -46,9 +46,9 @@ const user = computed(() => page.props.auth.user);
         />
 
         <Form
+            v-slot="{ errors, processing }"
             v-bind="ProfileController.update.form()"
             class="space-y-6"
-            v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">
                 <Label for="name">Name</Label>
@@ -61,7 +61,7 @@ const user = computed(() => page.props.auth.user);
                     autocomplete="name"
                     placeholder="Full name"
                 />
-                <InputError class="mt-2" :message="errors.name" />
+                <InputError class="mt-2" :message="errors.name"/>
             </div>
 
             <div class="grid gap-2">
@@ -76,7 +76,7 @@ const user = computed(() => page.props.auth.user);
                     autocomplete="username"
                     placeholder="Email address"
                 />
-                <InputError class="mt-2" :message="errors.email" />
+                <InputError class="mt-2" :message="errors.email"/>
             </div>
 
             <div v-if="mustVerifyEmail && !user.email_verified_at">
@@ -85,7 +85,13 @@ const user = computed(() => page.props.auth.user);
                     <Link
                         :href="send()"
                         as="button"
-                        class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                        class="
+                          text-foreground underline decoration-neutral-300
+                          underline-offset-4 transition-colors duration-300
+                          ease-out
+                          hover:decoration-current!
+                          dark:decoration-neutral-500
+                        "
                     >
                         Click here to resend the verification email.
                     </Link>
@@ -100,12 +106,15 @@ const user = computed(() => page.props.auth.user);
             </div>
 
             <div class="flex items-center gap-4">
-                <Button :disabled="processing" data-test="update-profile-button"
-                    >Save</Button
+                <Button
+                    :disabled="processing"
+                    data-test="update-profile-button"
                 >
+                    Save
+                </Button>
             </div>
         </Form>
     </div>
 
-    <DeleteUser />
+    <DeleteUser/>
 </template>

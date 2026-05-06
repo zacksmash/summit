@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['name', 'slug', 'is_personal'])]
@@ -21,17 +22,18 @@ class Team extends Model
     /**
      * Bootstrap the model and its traits.
      */
+    #[\Override]
     protected static function boot(): void
     {
         parent::boot();
 
-        static::creating(function (Team $team) {
+        static::creating(function (Team $team): void {
             if (empty($team->slug)) {
                 $team->slug = static::generateUniqueTeamSlug($team->name);
             }
         });
 
-        static::updating(function (Team $team) {
+        static::updating(function (Team $team): void {
             if ($team->isDirty('name')) {
                 $team->slug = static::generateUniqueTeamSlug($team->name, $team->id);
             }
@@ -51,7 +53,7 @@ class Team extends Model
     /**
      * Get all members of this team.
      *
-     * @return BelongsToMany<Model, $this>
+     * @return BelongsToMany<User, $this, Pivot>
      */
     public function members(): BelongsToMany
     {
@@ -86,6 +88,7 @@ class Team extends Model
      *
      * @return array<string, string>
      */
+    #[\Override]
     protected function casts(): array
     {
         return [
@@ -96,6 +99,7 @@ class Team extends Model
     /**
      * Get the route key for the model.
      */
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';

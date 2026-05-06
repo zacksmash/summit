@@ -49,20 +49,27 @@ const code = ref<string>('');
 </script>
 
 <template>
-    <Head title="Two-factor authentication" />
+    <Head title="Two-factor authentication"/>
 
     <div class="space-y-6">
         <template v-if="!showRecoveryInput">
             <Form
+                #default="{ errors, processing, clearErrors }"
                 v-bind="store.form()"
                 class="space-y-4"
                 reset-on-error
                 @error="code = ''"
-                #default="{ errors, processing, clearErrors }"
             >
-                <input type="hidden" name="code" :value="code" />
+                <input
+                    type="hidden"
+                    name="code"
+                    :value="code"
+                >
                 <div
-                    class="flex flex-col items-center justify-center space-y-3 text-center"
+                    class="
+                      flex flex-col items-center justify-center space-y-3
+                      text-center
+                    "
                 >
                     <div class="flex w-full items-center justify-center">
                         <InputOTP
@@ -81,16 +88,26 @@ const code = ref<string>('');
                             </InputOTPGroup>
                         </InputOTP>
                     </div>
-                    <InputError :message="errors.code" />
+                    <InputError :message="errors.code"/>
                 </div>
-                <Button type="submit" class="w-full" :disabled="processing"
-                    >Continue</Button
+                <Button
+                    type="submit"
+                    class="w-full"
+                    :disabled="processing"
                 >
+                    Continue
+                </Button>
                 <div class="text-center text-sm text-muted-foreground">
                     <span>or you can </span>
                     <button
                         type="button"
-                        class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                        class="
+                          text-foreground underline decoration-neutral-300
+                          underline-offset-4 transition-colors duration-300
+                          ease-out
+                          hover:decoration-current!
+                          dark:decoration-neutral-500
+                        "
                         @click="() => toggleRecoveryMode(clearErrors)"
                     >
                         {{ authConfigContent.buttonText }}
@@ -101,10 +118,10 @@ const code = ref<string>('');
 
         <template v-else>
             <Form
+                #default="{ errors, processing, clearErrors }"
                 v-bind="store.form()"
                 class="space-y-4"
                 reset-on-error
-                #default="{ errors, processing, clearErrors }"
             >
                 <Input
                     name="recovery_code"
@@ -113,16 +130,26 @@ const code = ref<string>('');
                     :autofocus="showRecoveryInput"
                     required
                 />
-                <InputError :message="errors.recovery_code" />
-                <Button type="submit" class="w-full" :disabled="processing"
-                    >Continue</Button
+                <InputError :message="errors.recovery_code"/>
+                <Button
+                    type="submit"
+                    class="w-full"
+                    :disabled="processing"
                 >
+                    Continue
+                </Button>
 
                 <div class="text-center text-sm text-muted-foreground">
                     <span>or you can </span>
                     <button
                         type="button"
-                        class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                        class="
+                          text-foreground underline decoration-neutral-300
+                          underline-offset-4 transition-colors duration-300
+                          ease-out
+                          hover:decoration-current!
+                          dark:decoration-neutral-500
+                        "
                         @click="() => toggleRecoveryMode(clearErrors)"
                     >
                         {{ authConfigContent.buttonText }}

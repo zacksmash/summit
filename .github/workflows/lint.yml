@@ -36,10 +36,7 @@ jobs:
       - name: Run Pint
         run: composer lint
 
-      - name: Format Frontend
-        run: npm run format
-
-      - name: Lint Frontend
+      - name: Lint & Format Frontend
         run: npm run lint
 
       # - name: Commit Changes

@@ -50,8 +50,8 @@ const handleOpenChange = (nextOpen: boolean) => {
             <Form
                 :key="formKey"
                 v-bind="destroy.form(props.team.slug)"
-                class="space-y-6"
                 v-slot="{ errors, processing }"
+                class="space-y-6"
                 @success="handleOpenChange(false)"
             >
                 <DialogHeader>
@@ -71,13 +71,13 @@ const handleOpenChange = (nextOpen: boolean) => {
                         </Label>
                         <Input
                             id="confirmation-name"
+                            v-model="confirmationName"
                             name="name"
                             data-test="delete-team-name"
-                            v-model="confirmationName"
                             placeholder="Enter team name"
                             autocomplete="off"
                         />
-                        <InputError :message="errors.name" />
+                        <InputError :message="errors.name"/>
                     </div>
                 </div>
 

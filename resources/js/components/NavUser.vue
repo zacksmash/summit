@@ -31,26 +31,31 @@ const currentTeam = computed(() => page.props.currentTeam as Team | null);
                 <DropdownMenuTrigger as-child>
                     <SidebarMenuButton
                         size="lg"
-                        class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                        class="
+                          data-[state=open]:bg-sidebar-accent
+                          data-[state=open]:text-sidebar-accent-foreground
+                        "
                         data-test="sidebar-menu-button"
                     >
-                        <UserInfo :user="user" :team="currentTeam" />
-                        <ChevronsUpDown class="ml-auto size-4" />
+                        <UserInfo :user="user" :team="currentTeam"/>
+                        <ChevronsUpDown class="ml-auto size-4"/>
                     </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                    class="w-(--reka-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                    class="
+                      w-(--reka-dropdown-menu-trigger-width) min-w-56 rounded-lg
+                    "
                     :side="
                         isMobile
                             ? 'bottom'
                             : state === 'collapsed'
-                              ? 'left'
-                              : 'bottom'
+                                ? 'left'
+                                : 'bottom'
                     "
                     align="end"
                     :side-offset="4"
                 >
-                    <UserMenuContent :user="user" />
+                    <UserMenuContent :user="user"/>
                 </DropdownMenuContent>
             </DropdownMenu>
         </SidebarMenuItem>

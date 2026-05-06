@@ -1,4 +1,85 @@
 <laravel-boost-guidelines>
+=== .ai/app rules ===
+
+# App Guidlines
+
+//
+
+=== .ai/clankers rules ===
+
+# AI Agent Session Rules
+
+These rules are mandatory for every AI coding session in this repository. Treat them as completion criteria, not suggestions.
+
+## PROGRESS.md is required
+
+- Read `PROGRESS.md` before planning, editing files, or marking work complete.
+- Add or update the current session entry whenever context, decisions, or unfinished work would help a future session.
+- Append a new session entry for each session. Never delete, rewrite, or reorder historical entries.
+- Resolve older open items in a newer entry instead of editing prior history in place.
+
+## Required session entry format
+
+Use this exact structure in `PROGRESS.md`:
+
+```md
+
+## Session: YYYY-MM-DD HH:MM TZ
+
+- Agent:
+- Branch:
+- Task:
+- Status: in_progress | completed | blocked | handed_off
+- Files Touched:
+- Verification:
+
+### Completed
+
+-
+
+### Decisions Made
+
+-
+
+### Current Context
+
+-
+
+### Open Items
+
+-
+
+### Next Step
+
+-
+```
+
+## Writing rules
+
+- Keep entries brief, factual, and durable.
+- Record decisions with enough reasoning that a future agent will not reopen the same question.
+- Record blockers, assumptions, and missing verification explicitly.
+- Use `Verification:` to say exactly what ran, or state `not run` with a reason.
+- Use `Files Touched:` for the main files only, not every incidental read.
+- If no code changed, still record the session when it changed direction, clarified requirements, or created a handoff another agent will rely on.
+
+## What not to write
+
+- Do not paste command output, stack traces, or large diffs.
+- Do not narrate trial-and-error debugging unless the failed path affects future decisions.
+- Do not restate obvious implementation details that are already clear from the code.
+
+## Before marking work complete
+
+Run the smallest verification set that matches the files you changed:
+
+- PHP changed: `vendor/bin/pint --dirty --format agent` and the smallest relevant `php artisan test --compact ...` command.
+- JS, TS, or Vue changed: `npm run lint`; add `npm run types:check` when types, route wiring, or page props changed.
+- Wide refactors or cross-cutting changes: expand verification only as needed to cover the risk.
+- Docs or process-only changes: record `Verification: not run (docs-only or process-only change)`.
+
+Do not claim work is complete if relevant verification failed or was skipped without explanation.
+
 === foundation rules ===
 
 # Laravel Boost Guidelines
@@ -22,6 +103,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/sail (SAIL) - v1
 - pestphp/pest (PEST) - v4
 - phpunit/phpunit (PHPUNIT) - v12
+- rector/rector (RECTOR) - v2
 - @inertiajs/vue3 (INERTIA_VUE) - v3
 - tailwindcss (TAILWINDCSS) - v4
 - vue (VUE) - v3
@@ -122,13 +204,6 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - The application is served by Laravel Herd at `https?://[kebab-case-project-dir].test`. Use the `get-absolute-url` tool to generate valid URLs. Never run commands to serve the site. It is always available.
 - Use the `herd` CLI to manage services, PHP versions, and sites (e.g. `herd sites`, `herd services:start <service>`, `herd php:list`). Run `herd list` to discover all available commands.
-
-=== tests rules ===
-
-# Test Enforcement
-
-- Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
-- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test --compact` with a specific filename or filter.
 
 === inertia-laravel/core rules ===
 

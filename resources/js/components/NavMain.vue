@@ -28,7 +28,7 @@ const { isCurrentUrl } = useCurrentUrl();
                     :tooltip="item.title"
                 >
                     <Link :href="item.href">
-                        <component :is="item.icon" />
+                        <component :is="item.icon"/>
                         <span>{{ item.title }}</span>
                     </Link>
                 </SidebarMenuButton>

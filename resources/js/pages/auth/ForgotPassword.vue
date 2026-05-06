@@ -22,7 +22,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Forgot password" />
+    <Head title="Forgot password"/>
 
     <div
         v-if="status"
@@ -32,7 +32,7 @@ defineProps<{
     </div>
 
     <div class="space-y-6">
-        <Form v-bind="email.form()" v-slot="{ errors, processing }">
+        <Form v-slot="{ errors, processing }" v-bind="email.form()">
             <div class="grid gap-2">
                 <Label for="email">Email address</Label>
                 <Input
@@ -43,7 +43,7 @@ defineProps<{
                     autofocus
                     placeholder="email@example.com"
                 />
-                <InputError :message="errors.email" />
+                <InputError :message="errors.email"/>
             </div>
 
             <div class="my-6 flex items-center justify-start">
@@ -52,7 +52,7 @@ defineProps<{
                     :disabled="processing"
                     data-test="email-password-reset-link-button"
                 >
-                    <Spinner v-if="processing" />
+                    <Spinner v-if="processing"/>
                     Email password reset link
                 </Button>
             </div>

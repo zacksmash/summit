@@ -32,14 +32,14 @@ function handleOpenChange(value: boolean) {
 <template>
     <Dialog :open="open" @update:open="handleOpenChange">
         <DialogTrigger as-child>
-            <slot />
+            <slot/>
         </DialogTrigger>
         <DialogContent>
             <Form
                 :key="formKey"
                 v-bind="store.form()"
-                class="space-y-6"
                 v-slot="{ errors, processing }"
+                class="space-y-6"
                 @success="open = false"
             >
                 <DialogHeader>
@@ -58,7 +58,7 @@ function handleOpenChange(value: boolean) {
                         placeholder="My team"
                         required
                     />
-                    <InputError :message="errors.name" />
+                    <InputError :message="errors.name"/>
                 </div>
 
                 <DialogFooter class="gap-2">

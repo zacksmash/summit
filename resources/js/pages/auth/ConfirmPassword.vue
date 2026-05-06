@@ -17,12 +17,12 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="Confirm password" />
+    <Head title="Confirm password"/>
 
     <Form
+        v-slot="{ errors, processing }"
         v-bind="store.form()"
         reset-on-success
-        v-slot="{ errors, processing }"
     >
         <div class="space-y-6">
             <div class="grid gap-2">
@@ -36,7 +36,7 @@ defineOptions({
                     autofocus
                 />
 
-                <InputError :message="errors.password" />
+                <InputError :message="errors.password"/>
             </div>
 
             <div class="flex items-center">
@@ -45,7 +45,7 @@ defineOptions({
                     :disabled="processing"
                     data-test="confirm-password-button"
                 >
-                    <Spinner v-if="processing" />
+                    <Spinner v-if="processing"/>
                     Confirm password
                 </Button>
             </div>

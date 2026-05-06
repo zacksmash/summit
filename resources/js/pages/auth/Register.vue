@@ -19,12 +19,12 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="Register" />
+    <Head title="Register"/>
 
     <Form
+        v-slot="{ errors, processing }"
         v-bind="store.form()"
         :reset-on-success="['password', 'password_confirmation']"
-        v-slot="{ errors, processing }"
         class="flex flex-col gap-6"
     >
         <div class="grid gap-6">
@@ -40,7 +40,7 @@ defineOptions({
                     name="name"
                     placeholder="Full name"
                 />
-                <InputError :message="errors.name" />
+                <InputError :message="errors.name"/>
             </div>
 
             <div class="grid gap-2">
@@ -54,7 +54,7 @@ defineOptions({
                     name="email"
                     placeholder="email@example.com"
                 />
-                <InputError :message="errors.email" />
+                <InputError :message="errors.email"/>
             </div>
 
             <div class="grid gap-2">
@@ -67,7 +67,7 @@ defineOptions({
                     name="password"
                     placeholder="Password"
                 />
-                <InputError :message="errors.password" />
+                <InputError :message="errors.password"/>
             </div>
 
             <div class="grid gap-2">
@@ -80,7 +80,7 @@ defineOptions({
                     name="password_confirmation"
                     placeholder="Confirm password"
                 />
-                <InputError :message="errors.password_confirmation" />
+                <InputError :message="errors.password_confirmation"/>
             </div>
 
             <Button
@@ -90,7 +90,7 @@ defineOptions({
                 :disabled="processing"
                 data-test="register-user-button"
             >
-                <Spinner v-if="processing" />
+                <Spinner v-if="processing"/>
                 Create account
             </Button>
         </div>
@@ -101,8 +101,9 @@ defineOptions({
                 :href="login()"
                 class="underline underline-offset-4"
                 :tabindex="6"
-                >Log in</TextLink
             >
+                Log in
+            </TextLink>
         </div>
     </Form>
 </template>

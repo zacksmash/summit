@@ -44,7 +44,7 @@ onUnmounted(() => clearTwoFactorAuthData());
 </script>
 
 <template>
-    <Head title="Security settings" />
+    <Head title="Security settings"/>
 
     <h1 class="sr-only">Security settings</h1>
 
@@ -56,6 +56,7 @@ onUnmounted(() => clearTwoFactorAuthData());
         />
 
         <Form
+            v-slot="{ errors, processing }"
             v-bind="SecurityController.update.form()"
             :options="{
                 preserveScroll: true,
@@ -67,7 +68,6 @@ onUnmounted(() => clearTwoFactorAuthData());
                 'current_password',
             ]"
             class="space-y-6"
-            v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">
                 <Label for="current_password">Current password</Label>
@@ -78,7 +78,7 @@ onUnmounted(() => clearTwoFactorAuthData());
                     autocomplete="current-password"
                     placeholder="Current password"
                 />
-                <InputError :message="errors.current_password" />
+                <InputError :message="errors.current_password"/>
             </div>
 
             <div class="grid gap-2">
@@ -90,7 +90,7 @@ onUnmounted(() => clearTwoFactorAuthData());
                     autocomplete="new-password"
                     placeholder="New password"
                 />
-                <InputError :message="errors.password" />
+                <InputError :message="errors.password"/>
             </div>
 
             <div class="grid gap-2">
@@ -102,7 +102,7 @@ onUnmounted(() => clearTwoFactorAuthData());
                     autocomplete="new-password"
                     placeholder="Confirm password"
                 />
-                <InputError :message="errors.password_confirmation" />
+                <InputError :message="errors.password_confirmation"/>
             </div>
 
             <div class="flex items-center gap-4">
@@ -135,13 +135,13 @@ onUnmounted(() => clearTwoFactorAuthData());
 
             <div>
                 <Button v-if="hasSetupData" @click="showSetupModal = true">
-                    <ShieldCheck />Continue setup
+                    <ShieldCheck/>Continue setup
                 </Button>
                 <Form
                     v-else
+                    #default="{ processing }"
                     v-bind="enable.form()"
                     @success="showSetupModal = true"
-                    #default="{ processing }"
                 >
                     <Button type="submit" :disabled="processing">
                         Enable 2FA
@@ -158,7 +158,7 @@ onUnmounted(() => clearTwoFactorAuthData());
             </p>
 
             <div class="relative inline">
-                <Form v-bind="disable.form()" #default="{ processing }">
+                <Form #default="{ processing }" v-bind="disable.form()">
                     <Button
                         variant="destructive"
                         type="submit"
@@ -169,7 +169,7 @@ onUnmounted(() => clearTwoFactorAuthData());
                 </Form>
             </div>
 
-            <TwoFactorRecoveryCodes />
+            <TwoFactorRecoveryCodes/>
         </div>
 
         <TwoFactorSetupModal

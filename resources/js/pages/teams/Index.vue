@@ -33,7 +33,7 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="Teams" />
+    <Head title="Teams"/>
 
     <h1 class="sr-only">Teams</h1>
 
@@ -47,7 +47,7 @@ defineOptions({
 
             <CreateTeamModal>
                 <Button data-test="teams-new-team-button">
-                    <Plus /> New team
+                    <Plus/> New team
                 </Button>
             </CreateTeamModal>
         </div>
@@ -84,7 +84,7 @@ defineOptions({
                                     as-child
                                 >
                                     <Link :href="edit(team.slug)">
-                                        <Eye class="h-4 w-4" />
+                                        <Eye class="size-4"/>
                                     </Link>
                                 </Button>
                             </TooltipTrigger>
@@ -102,7 +102,7 @@ defineOptions({
                                     as-child
                                 >
                                     <Link :href="edit(team.slug)">
-                                        <Pencil class="h-4 w-4" />
+                                        <Pencil class="size-4"/>
                                     </Link>
                                 </Button>
                             </TooltipTrigger>

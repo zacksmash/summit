@@ -95,7 +95,7 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
 </script>
 
 <template>
-    <Head :title="pageTitle" />
+    <Head :title="pageTitle"/>
 
     <h1 class="sr-only">{{ pageTitle }}</h1>
 
@@ -109,9 +109,9 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
             />
 
             <Form
+                v-slot="{ errors, processing }"
                 v-bind="update.form(team.slug)"
                 class="space-y-6"
-                v-slot="{ errors, processing }"
             >
                 <div class="grid gap-2">
                     <Label for="name">Team name</Label>
@@ -122,7 +122,7 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                         :default-value="team.name"
                         required
                     />
-                    <InputError :message="errors.name" />
+                    <InputError :message="errors.name"/>
                 </div>
 
                 <div class="flex items-center gap-4">
@@ -138,7 +138,7 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
         </div>
 
         <div v-else class="space-y-6">
-            <Heading variant="small" :title="team.name" />
+            <Heading variant="small" :title="team.name"/>
         </div>
 
         <!-- Members Section -->
@@ -159,7 +159,7 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                     data-test="invite-member-button"
                     @click="inviteDialogOpen = true"
                 >
-                    <UserPlus /> Invite member
+                    <UserPlus/> Invite member
                 </Button>
             </div>
 
@@ -168,18 +168,22 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                     v-for="member in members"
                     :key="member.id"
                     data-test="member-row"
-                    class="flex items-center justify-between rounded-lg border p-4"
+                    class="
+                      flex items-center justify-between rounded-lg border p-4
+                    "
                 >
                     <div class="flex items-center gap-4">
-                        <Avatar class="h-10 w-10">
+                        <Avatar class="size-10">
                             <AvatarImage
                                 v-if="member.avatar"
                                 :src="member.avatar"
                                 :alt="member.name"
                             />
-                            <AvatarFallback>{{
-                                getInitials(member.name)
-                            }}</AvatarFallback>
+                            <AvatarFallback>
+                                {{
+                                    getInitials(member.name)
+                                }}
+                            </AvatarFallback>
                         </Avatar>
                         <div>
                             <div class="font-medium">
@@ -195,7 +199,7 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                         <DropdownMenu
                             v-if="
                                 member.role !== 'owner' &&
-                                permissions.canUpdateMember
+                                    permissions.canUpdateMember
                             "
                         >
                             <DropdownMenuTrigger as-child>
@@ -206,7 +210,7 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                                 >
                                     {{ member.role_label }}
                                     <ChevronDown
-                                        class="ml-2 h-4 w-4 opacity-50"
+                                        class="ml-2 size-4 opacity-50"
                                     />
                                 </Button>
                             </DropdownMenuTrigger>
@@ -230,7 +234,7 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                         <TooltipProvider
                             v-if="
                                 member.role !== 'owner' &&
-                                permissions.canRemoveMember
+                                    permissions.canRemoveMember
                             "
                         >
                             <Tooltip>
@@ -241,7 +245,7 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                                         size="sm"
                                         @click="confirmRemoveMember(member)"
                                     >
-                                        <X class="h-4 w-4" />
+                                        <X class="size-4"/>
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -267,13 +271,18 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                     v-for="invitation in invitations"
                     :key="invitation.code"
                     data-test="invitation-row"
-                    class="flex items-center justify-between rounded-lg border p-4"
+                    class="
+                      flex items-center justify-between rounded-lg border p-4
+                    "
                 >
                     <div class="flex items-center gap-4">
                         <div
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-muted"
+                            class="
+                              flex size-10 items-center justify-center
+                              rounded-full bg-muted
+                            "
                         >
-                            <Mail class="h-5 w-5 text-muted-foreground" />
+                            <Mail class="size-5 text-muted-foreground"/>
                         </div>
                         <div>
                             <div class="font-medium">
@@ -294,7 +303,7 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                                     size="sm"
                                     @click="confirmCancelInvitation(invitation)"
                                 >
-                                    <X class="h-4 w-4" />
+                                    <X class="size-4"/>
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -317,10 +326,16 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                 description="Permanently delete your team"
             />
             <div
-                class="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10"
+                class="
+                  space-y-4 rounded-lg border border-red-100 bg-red-50 p-4
+                  dark:border-red-200/10 dark:bg-red-700/10
+                "
             >
                 <div
-                    class="relative space-y-0.5 text-red-600 dark:text-red-100"
+                    class="
+                      relative space-y-0.5 text-red-600
+                      dark:text-red-100
+                    "
                 >
                     <p class="font-medium">Warning</p>
                     <p class="text-sm">
@@ -331,8 +346,9 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                     data-test="delete-team-button"
                     variant="destructive"
                     @click="deleteDialogOpen = true"
-                    >Delete team</Button
                 >
+                    Delete team
+                </Button>
             </div>
         </div>
     </div>

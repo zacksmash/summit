@@ -9,6 +9,6 @@ const { title = '', description = '' } = defineProps<{
 
 <template>
     <AuthLayout :title="title" :description="description">
-        <slot />
+        <slot/>
     </AuthLayout>
 </template>
