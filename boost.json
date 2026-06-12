@@ -17,6 +17,8 @@
         "passport-development",
         "wayfinder-development",
         "pest-testing",
+        "inertia-vue-development",
+        "tailwindcss-development",
         "pest-browser-testing",
         "shadcn-vue",
         "starter-kit-upgrade",
