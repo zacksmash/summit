@@ -57,7 +57,7 @@ class TeamController extends Controller
                 'slug' => $team->slug,
                 'isPersonal' => $team->is_personal,
             ],
-            'members' => $team->members()->get()->map(function (User $member) {
+            'members' => $team->members()->get()->map(function (User $member): array {
                 /** @var Membership $membership */
                 $membership = $member->getRelation('pivot');
 
@@ -73,7 +73,7 @@ class TeamController extends Controller
             'invitations' => $team->invitations()
                 ->whereNull('accepted_at')
                 ->get()
-                ->map(fn ($invitation) => [
+                ->map(fn ($invitation): array => [
                     'code' => $invitation->code,
                     'email' => $invitation->email,
                     'role' => $invitation->role->value,
@@ -93,7 +93,7 @@ class TeamController extends Controller
         Gate::authorize('update', $team);
 
         $team = DB::transaction(function () use ($request, $team) {
-            $team = Team::whereKey($team->id)->lockForUpdate()->firstOrFail();
+            $team = Team::query()->whereKey($team->id)->lockForUpdate()->firstOrFail();
 
             $team->update(['name' => $request->validated('name')]);
 
@@ -127,10 +127,10 @@ class TeamController extends Controller
             ? $user->fallbackTeam($team)
             : null;
 
-        DB::transaction(function () use ($user, $team) {
-            User::where('current_team_id', $team->id)
+        DB::transaction(function () use ($user, $team): void {
+            User::query()->where('current_team_id', $team->id)
                 ->where('id', '!=', $user->id)
-                ->each(fn (User $affectedUser) => $affectedUser->switchTeam($affectedUser->personalTeam()));
+                ->each(fn (User $affectedUser): bool => $affectedUser->switchTeam($affectedUser->personalTeam()));
 
             $team->invitations()->delete();
             $team->memberships()->delete();

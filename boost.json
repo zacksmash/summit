@@ -1,7 +1,8 @@
 {
     "agents": [
         "claude_code",
-        "codex"
+        "codex",
+        "copilot"
     ],
     "cloud": false,
     "guidelines": true,
@@ -11,9 +12,14 @@
     "skills": [
         "fortify-development",
         "laravel-best-practices",
+        "mcp-development",
+        "octane-development",
+        "passport-development",
         "wayfinder-development",
         "pest-testing",
-        "inertia-vue-development",
-        "tailwindcss-development"
+        "pest-browser-testing",
+        "shadcn-vue",
+        "starter-kit-upgrade",
+        "vibe-engineer"
     ]
 }
