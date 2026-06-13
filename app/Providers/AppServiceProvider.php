@@ -3,11 +3,12 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
-use Laravel\Passport\Passport;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Passport\Passport;
+use Symfony\Component\HttpFoundation\Response;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -50,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Passport::authorizationView(
-            fn ($parameters) => view('mcp.authorize', $parameters)
+            fn (array $parameters): Response => response()->view('mcp.authorize', $parameters)
         );
     }
 }
