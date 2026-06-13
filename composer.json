@@ -14,7 +14,7 @@
         "laravel/chisel": "^0.1.0",
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.7",
-        "laravel/mcp": "^0.8.0",
+        "laravel/mcp": "^0.8.1",
         "laravel/octane": "^2.17",
         "laravel/passport": "^13.0",
         "laravel/tinker": "^3.0",
@@ -97,6 +97,10 @@
             "@php artisan test --parallel --ansi"
         ],
         "db": "open database/database.sqlite",
+        "inspect:mcp": [
+            "Composer\\Config::disableProcessTimeout",
+            "NODE_OPTIONS=--use-system-ca npx @mcpjam/inspector@latest"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
