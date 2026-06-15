@@ -97,7 +97,7 @@
             "@php artisan test --parallel --ansi"
         ],
         "db": "open database/database.sqlite",
-        "inspect:mcp": [
+        "mcp:inspect": [
             "Composer\\Config::disableProcessTimeout",
             "NODE_OPTIONS=--use-system-ca npx @mcpjam/inspector@latest"
         ],
