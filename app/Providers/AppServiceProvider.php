@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -27,9 +28,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->registerDevCommands();
+
         $this->configureDefaults();
 
         $this->configureMcpAuthorizationView();
+    }
+
+    /**
+     * Register development commands for the "dev" Artisan command.
+     */
+    protected function registerDevCommands(): void
+    {
+        DevCommands::except('server');
+
+        DevCommands::artisan('octane:start --watch', 'octane')->orange();
     }
 
     /**
@@ -55,7 +68,7 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Configure the Passport authoriztion view for the MCP server
+     * Configure the Passport authorization view for the MCP server
      */
     public function configureMcpAuthorizationView(): void
     {
