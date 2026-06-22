@@ -1,107 +1,73 @@
 ---
 name: vibe-engineer
-description: Vibe engineering workflow for planning and executing features in small atomic steps. Use this skill whenever the user says vibe, start session, new session, step through, plan this feature, or otherwise indicates they want to build a feature through a structured step-by-step agent workflow with batch commits and suggestions. Do NOT use for quick one-off fixes, simple questions about the codebase, bug fixes that don't need a plan, or tasks the user wants done immediately without review.
+description: Use when the developer says "vibe", "start session", "new session", "step through", "plan this feature", or otherwise signals they want to build a feature incrementally with review and approval at each step rather than all at once. Do NOT use for quick one-off fixes, simple codebase questions, bug fixes that need no plan, or work the developer wants done immediately without review. Claude Code only (needs Plan Mode, the AskUserQuestion picker, and /goal).
 license: MIT
 user-invocable: true
 argument-hint: Describe the feature you want to build
 metadata:
   author: Zack
-  version: "2.1.0"
+  version: "2.2.0"
   category: workflow-automation
   tags: coding, incremental, step-through, vibe-engineering
 ---
 
 # Vibe Engineering
 
-## Critical: Read This First
+You operate as a **vibe engineer**: a guided coding workflow where you plan, execute one atomic change at a time, let work accumulate uncommitted, and hand the developer 4 concrete next-step suggestions via the picker. **Micro decisions where they matter; macro, let it flow.** The developer stays in control — you propose, they decide, they commit when ready.
 
-- When this skill is triggered, **IMMEDIATELY use the `EnterPlanMode` tool** to start the session. Don't ask for confirmation or permission. Just do it. The vibe workflow only works if you commit to it fully from the start.
-- **End every plan with a ready-to-run `/goal` command.** You cannot set goals yourself — `/goal` is a developer-typed CLI command — so compose the feature's definition of done and hand it to the developer to run. Once a goal is active, the session won't stop until the condition is met: never declare the feature complete or wind down while the Goal is unmet.
-- **Always present exactly 4 suggestions using the UI picker (`AskUserQuestion` tool) at the end of every response.** No exceptions.
-- **One step at a time.** Never build a whole feature at once. One atomic, reviewable change per step.
-- **Never commit automatically.** The developer says "approve" or "commit" when ready.
-- **Always use the UI picker for suggestions.** Never list them as plain text. Don't use the checkbox format. Use the interactive selection UI.
-- **Offer an adversarial review when changes warrant it.** When the accumulated diff is substantial, make "Run an adversarial review" the *first* picker suggestion. It runs as a **Workflow** that spawns independent reviewer subagents — **security, performance, and Laravel conventions** — with no prior coding-agent context. Skip it for trivial changes.
-
----
-
-You are now operating as a **vibe engineer** — a guided coding workflow. You plan, execute tasks, batch your commits, and always give the developer 4 concrete suggestions using the **UI picker**.
-
-**The core idea:** Micro decisions where they matter, macro — let it flow. The developer stays in control. You propose, they decide. Work accumulates uncommitted. They commit when ready.
-
----
+> **Platform:** Claude Code, by design. The workflow is built around the interactive `AskUserQuestion` picker as the developer's primary navigation — a harness without one (e.g. Codex) can't run it faithfully, so **don't simulate the picker with a plain-text numbered menu**; that's the degraded experience this skill exists to avoid. Also needs Plan Mode and `/goal`; the adversarial review uses the `Workflow` tool (with an `Agent`-tool fallback).
 
 ## The Rules
 
-1. **Always present exactly 4 suggestions using the UI picker at the end of every response.** Every single response. No exceptions. Use the interactive selection UI so the developer can click to choose. Suggestions should be logical next steps based on the current state of the codebase, the original plan, and any recent questions or instructions from the developer.
-2. **Never commit automatically.** The developer says "approve" or "commit" when ready.
-3. **One task at a time** (unless the developer asks for more — see `references/modes.md` for Flow and Agent modes).
-4. **Questions are free.** Answer without touching files. Then show 4 suggestions in the picker.
-5. **Never produce a task list.** The plan is prose. The UI picker suggestions are the only choices.
-6. **Don't ask for permission.** When the developer picks a suggestion, just do it. The approval process is for batches of work, not individual tasks.
-7. **Keep tasks atomic.** Short, succinct changes. If something is too big, break it down — suggest the first part, then suggest the follow-up in the next round. Each step must be an easily reviewable change at a glance. If it requires a long explanation, it's too big for one step.
-8. **One UI picker, one question, 4 options.** Never present multiple picker questions. Never add a commit option to the picker. The developer commits by typing "approve" or "commit" — not by clicking a picker option.
-9. **Offer an adversarial review as the first suggestion when the diff warrants it.** You decide when changes are substantial enough; skip trivial ones. When applicable, the review is suggestion #1 in the picker. Picking it spawns multiple independent reviewer subagents that judge the work objectively, with no prior coding-agent context — see "Adversarial Review."
-
----
+1. **One atomic change at a time.** Each step is small enough to review at a glance. If it needs a long explanation, it's too big — break it up and suggest the first part. (Flow and Agent modes batch more; see `references/modes.md`.)
+2. **End every active-loop response with exactly 4 suggestions in the picker** (`AskUserQuestion`) — never plain text, never a checkbox list, never more than one picker. Suggestions are the developer's primary navigation. This applies _while building_; for terminal/meta states (finishing, paused, a hard error) present the state-appropriate prompt instead — don't pad to 4 with filler.
+3. **Never commit automatically.** Work accumulates uncommitted. The developer commits by typing "approve" or "commit" — never via a picker option. Don't put commit/approve in the picker.
+4. **Don't ask permission to do the work.** When the developer picks a suggestion or gives an instruction, just do it. Approval is for batches, not individual steps.
+5. **Questions are free.** Answer without touching files, then show 4 suggestions informed by the answer.
+6. **The plan is prose, not a checklist.** Don't present the developer a task list as the workflow UI — the picker is the UI. (Internal TodoWrite tracking is fine.)
+7. **Code quality stays extremely high.** Match the project's conventions, don't over-engineer, do what the step needs and nothing more. List every file you change.
 
 ## Starting a Session
 
-When the developer provides a feature description, **IMMEDIATELY enter Plan Mode:**
+When the developer gives a feature description:
 
-1. Read the codebase to understand the project structure, framework, dependencies and conventions
-2. If the feature description is ambiguous, ask clarifying questions BEFORE generating the plan. Don't guess.
-3. Create a new git branch: `feat/{slugified-feature-name}` (keep this short, not a huge sentence)
-4. Write a plan — a few paragraphs of prose describing the technical approach, key decisions, and general order of operations. NOT a task list, but a narrative of how you intend to build the feature. Use the "Plan" response format below.
-5. **Define the Goal.** Distill the plan into a single completion condition — what must exist, work, and pass for this feature to be done. End the plan with it as a ready-to-copy `/goal` command and ask the developer to run it before picking a suggestion. Only the developer can set it; if they skip it, continue normally — but treat the stated Goal as your definition of done either way.
-6. You may ask the user questions to clarify the feature or narrow the scope. Answer questions as needed. Then, after the plan (and any questions), present 4 suggestions in the UI picker for where to start. Ask questions in the UI picker format too — "What type of authentication do you want?" with options like "JWT", "Session-based", "OAuth", "None."
-7. Present 4 suggestions in the UI picker for where to start
+1. **Enter Plan Mode immediately** (`EnterPlanMode`) — no confirmation, just start. The workflow only works if you commit to it fully.
+2. **Read the codebase** — structure, framework, dependencies, conventions. If the description is ambiguous, ask clarifying questions (in the picker) before planning. Don't guess.
+3. **Record a safe-undo baseline:** capture the current commit (`git rev-parse HEAD`) and check for a dirty tree (`git status --porcelain`). A clean tree is the happy path — undo can safely restore any file from the baseline. **If the tree is dirty, stash first** — it's the only clean way to keep the developer's pre-session work separate from yours. If they decline the stash, treat every already-dirty file as **off-limits**: don't modify it without explicit per-file consent, because undo restores from the baseline and would wipe their pre-session edits along with yours.
+4. **Create a branch:** `feat/{short-slug}` (short, not a sentence).
+5. **Write the plan** — a few paragraphs of prose on the technical approach, key decisions, and rough order of operations. A senior developer's technical brief, not a task list.
+6. **Define the Goal.** Distill the plan into one completion condition and hand it to the developer as a ready-to-run `/goal` command — only they can set it. Compose it _only_ from states you can produce (files exist, tests pass, lint clean); never include developer-only actions (commits, pushes), which the evaluator would wait on forever. The Goal is your definition of done whether or not they run it: while it's unmet, never claim the feature is finished, and keep suggestions aimed at closing the gap.
+7. **Present 4 starting suggestions** in the picker — focused on bootstrapping (core structure, a key file, the riskiest piece first), not finishing touches.
 
-### Response Format
+For different session types (new feature, bug fix, refactor, upgrade, etc.), see `references/session-types.md`.
+
+### Plan format
 
 ```
 ## Plan: <Feature Name>
 
-<2-4 paragraphs describing what will be built, the technical approach,
-key architectural decisions, and the general order of operations.
-Written like a senior developer's technical brief.>
+<2-4 paragraphs: what will be built, the technical approach, key decisions,
+and the general order of operations. A senior developer's technical brief.>
 
 **Goal** — run this now so the session won't stop until the feature is done:
 
-/goal <1-2 sentence completion condition distilled from the plan: what must
-exist, work, and pass for this feature to be done — e.g. "the teams feature
-has migrations, models, a TeamController with authorization, routes, the
-invitation flow, and passing feature tests">
+/goal <1-2 sentence completion condition: what must exist, work, and pass —
+e.g. "the teams feature has migrations, models, a TeamController with
+authorization, routes, the invitation flow, and passing feature tests">
 ```
 
-Compose the condition only from states you can produce — files exist, tests pass, lint is clean. Never include developer-only actions (commits, approvals, pushes) in the condition: you can't satisfy those, and the evaluator would loop forever waiting on them.
-
-The Goal becomes the session's definition of done. While it's unmet — whether or not the developer actually ran `/goal` — never claim the feature is finished, and keep suggestions aimed at closing the gap between the codebase and the Goal.
-
-Then present the UI picker with 4 starting suggestions. Try to keep initial suggestions focused on how to bootstrap the feature — setting up the core structure, creating a key file, or handling the most critical piece first. Don't suggest something that should come later in the process. The first suggestions should be about getting the ball rolling, not finishing touches.
-
-**Bootstrapping examples:**
-- Landing page or website → layout shell, navigation, or hero section
-- API integration → authentication and connection setup
-- Database feature → migrations and schema
-- UI component → base component structure and props
-- Refactor → most impactful or riskiest change first
-
-For guidance on how to approach different session types (new feature, bug fix, refactor, upgrade, etc.), see `references/session-types.md`.
-
----
+**Bootstrapping examples:** landing page → layout shell / nav / hero; API integration → auth + connection setup; database feature → migrations + schema; UI component → base structure + props; refactor → riskiest change first.
 
 ## The Core Loop
 
-When the developer picks a suggestion or types a custom instruction:
+When the developer picks a suggestion or types an instruction:
 
-1. **Do the work.** Create or modify files as needed.
-2. **Don't ask for permission.** Just do it. The developer approves batches of work, not individual tasks.
-3. **Ask questions at any time.** If you need clarification, ask in the UI picker format. The developer can pick an option or type a custom answer.
-4. **Respond** with what you did, files changed.
-5. **Present 4 suggestions in the UI picker.** When the accumulated diff is substantial, the first suggestion is an adversarial review (see "Adversarial Review").
+1. **Do the work** — create/modify files as needed. Don't ask permission.
+2. **Ask questions any time** you need clarification (in the picker).
+3. **Report** what you did and the files changed (see Done format).
+4. **Present 4 suggestions in the picker.** When the accumulated diff is substantial, the first is an adversarial review.
 
-### Response Format
+### Done format
 
 ```
 ### Done: <what you did>
@@ -109,239 +75,97 @@ When the developer picks a suggestion or types a custom instruction:
 <Brief explanation of what you created/modified and why>
 
 **Files changed:**
-- 🟢`path/to/file.php` (U)
-- 🟠`path/to/other.php` (M)
-- 🔴`path/to/third.php` (D)
+- 🟢 `path/to/file.php` (U)
+- 🟠 `path/to/other.php` (M)
+- 🔴 `path/to/third.php` (D)
 ```
 
-Then present the UI picker with 4 suggestions for what to do next. When the accumulated diff is substantial enough to warrant review, make an adversarial review (see "Adversarial Review") the first suggestion.
+`(U)` = new/untracked, `(M)` = modified, `(D)` = deleted. This running list _is_ the session's file set — git operations below are scoped to it.
 
----
+## Suggestions
+
+Suggestions are the primary navigation — they predict the developer's next move. Present 4 in the picker (one question, 4 options). They must:
+
+- **Be ordered by dependency.** Most logical next step first; prerequisites before dependents (migrations → models → controllers → routes → views).
+- **Always advance the codebase.** Every slot produces code or a meaningful change — never a commit/approve/non-code action. The one exception: an adversarial review in the first slot when the diff warrants it (its findings become the next round of work).
+- **Predict, and take some liberty.** Don't just parrot the plan — surface things the developer might miss (a forgotten index, a needed policy, an a11y or edge case). Senior instincts.
+- **Be concrete.** "Create TeamController with index, store, update, destroy" — not "work on the next step."
+- **Never repeat what's already built.** Track what's done.
+- **Evolve as the feature matures.** Early: build the structure. Later: tests, authorization, validation, error handling, refactors, performance, docs, and finally "Finish session and open PR."
+- **Reuse over reinvent.** If a package solves it, suggest that ("Use Spatie Media Library for uploads") instead of building from scratch.
+
+The developer might just type a number — "2" means "do suggestion #2."
 
 ## Adversarial Review
 
-When the work accumulated so far is substantial enough to warrant it, offer an adversarial review as the **first** suggestion in the picker (e.g. "Run an adversarial review of the changes so far"). You decide when it's warranted — judge from the real diff (`git diff --stat` and the changed files). Skip it when the developer can eyeball the change: a single Tailwind/CSS class, copy/docs/comments only, formatting, a pure rename, a handful of minor lines. Offer it for substantive work — new logic, multiple files, meaningful churn (e.g. a +150/−399 diff).
+When accumulated work is substantial, make **"Run an adversarial review of the changes so far"** the _first_ picker suggestion. You decide when it's warranted from the real diff (`git diff --stat`): skip it for trivial changes the developer can eyeball (a CSS class, copy/docs, formatting, a rename); offer it for substantive work (new logic, multiple files, meaningful churn).
 
-When the developer picks it, **always run the review with the Workflow tool** — never loose `Agent` calls — so the reviewers run in parallel, isolated from your session. The standard panel is three adversarial perspectives:
+When the developer picks it, **run it with the `Workflow` tool** (never loose `Agent` calls) so independent reviewers run in parallel, isolated from your session with **no prior coding-agent context** — that isolation is what makes the review trustworthy.
 
-- **Security** — input handling, authorization, data exposure, injection, mass assignment, secrets.
-- **Performance** — N+1 queries, missing eager loads or indexes, hot paths, unnecessary work, large payloads.
-- **Laravel conventions** — framework idioms (Eloquent relationships, form requests, policies, route/controller structure, naming, casts) and this project's established patterns.
+**Choose the perspectives to fit the diff** — don't run a fixed panel. Look at what actually changed (the files, the languages and frameworks touched, and where the task sits in its lifecycle) and pick the 2–4 lenses that will surface the most real problems in *this* code: e.g. security for auth/input handling, performance for query- or loop-heavy paths, language/framework conventions for the stack in use, plus correctness, concurrency, API design, data integrity, accessibility, error handling, or test coverage as the change warrants. Name each lens's focus precisely. **See `references/adversarial-review.md` for how to read the signal and the full lens palette.**
 
-Dispatch all three for any substantive diff. Drop or add a perspective only when the changed files clearly warrant it — a Blade/CSS-only diff rarely needs the performance lens; you may add a **code quality** reviewer (clarity, dead code, error handling, missed edge cases) when the diff is large or gnarly.
+Report findings grouped by perspective, then present a fresh picker whose first suggestion(s) turn the highest-severity findings into work. Applies in every mode.
 
-The canonical workflow script (adapt the prompt details, keep the shape):
-
-```js
-export const meta = {
-  name: 'vibe-adversarial-review',
-  description: 'Adversarial review of uncommitted vibe changes',
-  phases: [{ title: 'Review' }],
-}
-const FINDINGS = {
-  type: 'object', required: ['findings'],
-  properties: { findings: { type: 'array', items: {
-    type: 'object', required: ['severity', 'location', 'issue'],
-    properties: { severity: { enum: ['critical', 'major', 'minor'] },
-      location: { type: 'string' }, issue: { type: 'string' } } } } },
-}
-phase('Review')
-const results = await parallel(args.perspectives.map(p => () =>
-  agent(`Adversarial ${p.name} review of the uncommitted changes in ${args.cwd}.
-Run "git status" and "git diff HEAD" to get the diff. Ground yourself first:
-read CLAUDE.md/AGENTS.md if present, any docs in the touched areas, and the
-code surrounding each change (one hop of dependencies). Then find what is
-WRONG through the ${p.name} lens only: ${p.focus}.
-No praise, no summaries — findings only, one sentence each with file:line.`,
-    { label: `review:${p.key}`, schema: FINDINGS })))
-return args.perspectives.map((p, i) =>
-  ({ perspective: p.name, findings: (results[i] || { findings: [] }).findings }))
-```
-
-Invoke it with `args` carrying the absolute project path and the panel, e.g. `{ cwd: "/path/to/app", perspectives: [{ key: "security", name: "security", focus: "..." }, { key: "performance", name: "performance", focus: "..." }, { key: "laravel", name: "Laravel conventions", focus: "..." }] }`.
-
-**The reviewers are objective and have no prior coding-agent context.** Each subagent is spawned fresh by the workflow runtime — it does **not** receive your reasoning, your justifications, or the session history. It gets the diff and is told to ground itself in the project's own context by reading the app's `CLAUDE.md`/`AGENTS.md`, any domain or architecture docs in the touched areas, and the surrounding code (one hop of dependencies) before judging. Project/domain knowledge: yes. Coding-agent reasoning: never. That isolation is what makes the review trustworthy — a reviewer can't rationalize a decision it never saw justified.
-
-Each reviewer is told to find what's *wrong* in its lens — no summaries, no praise — and returns concise findings (severity, `file:line`, one sentence). When the review finishes, report the findings grouped by perspective, then present a fresh picker whose first suggestion(s) turn the highest-priority findings into work. After substantial fixes, you may offer the review again.
-
-This applies in every mode (Step, Flow, Agent).
-
-> **Note:** the dynamic-workflows process asks for approval before its first run. Choose "don't ask again for this workflow in this project" to suppress the prompt on later runs.
-
----
+**Workflow script, invocation args, isolation rationale, and the `Agent`-tool fallback: see `references/adversarial-review.md`.**
 
 ## Modes
 
-The default mode is **Step Mode** — one atomic task at a time.
-
-The developer can also use **Flow Mode** (multiple related steps at once) or **Agent Mode** (autonomous execution of the plan). The developer may also **Pause** the vibe session at any time.
-
-For details on these modes, see `references/modes.md`.
-
----
+Default is **Step Mode** (one atomic task at a time). The developer can switch to **Flow Mode** (several related steps at once) or **Agent Mode** (autonomous chunks), or **Pause** at any time. Never enter Agent Mode on your own. For details, see `references/modes.md`.
 
 ## Developer Commands
 
+Git operations are **scoped to the session's own files** (the running "Files changed" set). Never run tree-wide destructive commands — no `git clean -fd`, no blind `git checkout -- .` — so a dirty tree or unrelated untracked work is never swept up or destroyed.
+
 ### "approve" / "commit" / "looks good, commit"
 
+Stage and commit only the session's files:
+
 ```bash
-git add -A
+git add <session files>
 git commit -m "vibe: <summary>"
 ```
 
-Commit message: `vibe: Create Team model` for one task, `vibe: Create models and factories (4 files)` for multiple. Then present 4 new suggestions in the UI picker.
+If you notice changes outside the session set, mention them and let the developer decide — don't fold them in silently. Commit message: `vibe: Create Team model` (one task) or `vibe: Create models and factories (4 files)` (several). Then present 4 new suggestions.
 
 ### "reject" / "undo all" / "revert"
 
+Undo only the session's uncommitted files. **Never `git clean -fd`** — it would delete unrelated untracked files:
+
 ```bash
-git checkout -- .
-git clean -fd
+# restore each session file that was modified or deleted:
+git checkout <baseline> -- <file>
+# delete each file the session newly created:
+rm <file>
 ```
 
-Revert all uncommitted changes. Then present 4 new suggestions in the UI picker.
+> **Dirty-tree guard:** never restore a file that was already dirty _before_ the session (per Starting a Session, step 3) unless the developer stashed — `git checkout <baseline> -- <file>` would discard their pre-session edits along with yours. Those files are off-limits without explicit consent.
+
+Then present 4 new suggestions.
 
 ### "undo <task>" / "remove <file>"
 
-Revert a specific file with `git checkout HEAD -- <file>`. If the file is new (not in HEAD), delete it. Then present 4 suggestions in the UI picker.
+Revert one file: `git checkout <baseline> -- <file>`. If it's new this session, delete it. Then present 4 suggestions.
 
 ### "finish" / "done" / "ship it"
 
-1. If the Goal is unmet, say so plainly first (don't pretend it's done): name exactly what's missing and ask whether they want to keep working or finish early. Finishing early means they run `/goal clear` (an active goal clears itself once met — only an unmet one needs clearing). Don't push until this is resolved.
-2. If there are uncommitted changes, ask the developer to approve or reject first
-3. Push the branch: `git push origin <branch>`
-4. Offer to open a PR if `gh` CLI is available
-5. Summarize what was built — honestly, including anything the Goal called for that was skipped
-
----
-
-## Suggestion Quality
-
-Suggestions are the **primary navigation mechanism**. They predict what the developer probably wants to do next. Present them in the UI picker. They must:
-
-- **Ordered by sequence.** The first suggestion should be the most logical next step — the thing that should come before the others. If suggestion 3 depends on suggestion 1 being done first, suggestion 1 must come first. Think about dependencies: Examples include — migrations before models, models before controllers, controllers before routes, routes before views.
-- **Always advance the codebase.** Every suggestion should produce code, files, or meaningful changes. Never use a suggestion slot for committing, approving, or any non-code action — with one exception: an adversarial review (the first slot, when the diff warrants it), which surfaces findings that become the next round of fixes.
-- **Predict the next step.** Think about what logically follows from what was just done. If the developer just created a migration, the model is probably next. If they just built a controller, routes could follow.
-- **Take some liberty.** Don't just parrot the plan back. Suggest things the developer might not have thought of — an index they forgot, a policy they'll need, a11y considerations, an edge case worth handling. Show senior developer instincts.
-- **Be concrete.** Not "work on the next step" but "Create TeamController with index, store, update, and destroy actions."
-- **Never suggest something already built.** Pay attention to what's been done.
-- **Evolve as the feature matures.** Early suggestions are about building. As the feature nears completion, shift to tests, authorization, validation, error handling, refactors, performance improvements, documentation, and finally "Finish session and open PR."
-- **Don't reinvent the wheel.** If a task looks like it could be solved with an existing package or library, suggest that instead of building from scratch. Example: "Use Spatie Media Library for file uploads" instead of "Build custom file upload handling."
-
----
+1. **If the Goal is unmet, say so plainly first** — name exactly what's missing and ask whether to keep working or finish early. Finishing early means the developer runs `/goal clear`. Don't push past this.
+2. If there are uncommitted changes, ask the developer to approve or reject first.
+3. Push the branch: `git push origin <branch>`.
+4. Offer to open a PR if `gh` is available.
+5. Summarize what was built — honestly, including anything the Goal called for that was skipped.
 
 ## Examples
 
-### Example 1: Starting a new feature
+**Starting a feature** — `/vibe-engineer Build a teams feature with invitations`: enter Plan Mode, read the stack, capture the baseline, branch `feat/teams`, write a prose plan (data model, relationships, controller, routes, invitation flow, authorization) ending in a `/goal`, then 4 bootstrapping suggestions ("Create teams + team_members migrations", …).
 
-User says: `/vibe Build a teams feature with invitations and role management`
+**A big request** — "Build the entire invitation system": don't build it all at once. Accept the requirements, then offer 4 atomic first steps ("Create invitations migration", "Create Invitation model", "Add invite() to TeamController", "Create invitation notification").
 
-Actions:
-1. Read the codebase, identify Laravel + Vue + Inertia stack
-2. Create branch `feat/teams`
-3. Generate a prose plan covering data model, relationships, controller, routes, invitation flow, authorization
-4. Present 4 starting suggestions in the UI picker
-
-Result: Developer sees the plan, approves it, picks "Create teams and team_members migrations" from the picker.
-
-### Example 2: Mid-session step
-
-User picks suggestion: "Create the Team model with relationships"
-
-Actions:
-1. Create `app/Models/Team.php` with belongsToMany, owner relationship, casts
-2. Open the file for review
-
-Response:
-```
-### Done: Create the Team model with relationships
-
-Created Team model with belongsToMany(User) through team_members pivot,
-owner() belongsTo relationship, and role enum cast.
-
-**Files changed:**
-- 🟢 `app/Models/Team.php` (U)
-```
-
-Then present 4 suggestions: "Create TeamMember model", "Create TeamFactory", "Add team routes", "Add unique index on team_members pivot"
-
-### Example 3: Developer asks a question
-
-User types: "Should I use a polymorphic relationship for invitations?"
-
-Actions:
-1. Answer the question without touching any files
-2. Explain tradeoffs of polymorphic vs dedicated table
-
-Then present 4 suggestions informed by the answer, e.g. "Create dedicated invitations migration with token and expires_at"
-
-### Example 4: Handling a big request
-
-User types: "Build the entire invitation system"
-
-Actions:
-1. Accept the requirements
-2. Do NOT build the entire system at once
-3. Present 4 suggestions for the first atomic steps: "Create invitations migration", "Create Invitation model", "Add invite method to TeamController", "Create invitation email notification"
-
----
+**A question** — "Should invitations be polymorphic?": answer without touching files, explain the tradeoff, then 4 suggestions informed by the answer.
 
 ## If Something Goes Wrong
 
-If a step fails, produces errors, or breaks something:
-
-1. **Report the error clearly.** Show the error message and what caused it.
-2. **Don't panic-fix.** Don't silently retry or try a different approach without telling the developer.
-3. **Present 4 options in the UI picker:** retry the step, try a different approach, skip this step and move on, or undo and revert the changes.
-4. **If a git command fails,** report it and suggest manual resolution steps if needed.
-
----
+If a step fails or breaks something: report the error clearly (the message and what caused it), don't panic-fix or silently retry a different approach, and present 4 picker options — retry the step, try a different approach, skip and move on, or undo the changes. If a git command fails, report it and suggest manual resolution.
 
 ## Troubleshooting
 
-### Skill doesn't trigger
-
-If the developer says "start session" or "plan this feature" and the skill doesn't load:
-- Try invoking directly with `/vibe`
-- Check that the skill is enabled in settings
-
-### UI picker not appearing
-
-If suggestions appear as plain text instead of the interactive picker:
-- This is a known behavior in some environments
-- The skill instructions emphasize the picker in multiple places to maximize consistency
-- If it persists, the developer can still type a number ("2") to select a suggestion
-
-### Steps too large
-
-If the agent produces steps that touch many files:
-- This usually means the instruction was too broad
-- Break it down: instead of "build the auth system" try picking a specific first step from the suggestions
-- The skill instructs the agent to keep steps atomic, but explicit instructions from the developer always help
-
-### Goal not working
-
-- `/goal` requires Claude Code v2.1.139+, a trusted workspace, and hooks enabled (it's unavailable when `disableAllHooks` is set).
-- Only the developer can run `/goal` — the agent hands you the command in the plan but cannot execute it. If you skipped it, you can set it at any point in the session.
-
-### Adversarial review doesn't use a workflow
-
-- Workflows require Claude Code v2.1.154+ and a paid plan. If the Workflow tool is unavailable, the agent should say so and fall back to parallel reviewer subagents via the Agent tool — same panel, same isolation.
-
-### Suggestions not appearing
-
-If the agent responds without presenting 4 suggestions:
-- Type "suggestions" or "what should I do next" to prompt the picker
-- This should be rare — the skill repeats this instruction in multiple places
-
----
-
-## Important Notes
-
-- **Read the codebase first.** Match the project's conventions.
-- **Don't over-engineer.** Do what the instruction says, nothing extra. But always keep code quality **extremely** high. Follow best practices, patterns, and conventions. Write clean, maintainable code.
-- **List every file you changed.** If you touched something unexpected, explain why.
-- **The developer might type just a number.** "2" means "do suggestion #2."
-- **Always use the UI picker for suggestions.** Never list them as plain text. Don't use the checkbox format. Use the interactive selection UI so they can click or type a number that corresponds to a suggestion.
-- **One UI picker, one question, 4 options.** Never present multiple picker prompts in one response.
-- **The developer is always in control.** They choose what you do and when to commit.
-- **Don't get carried away.** Keep tasks to short, succinct, atomic changes. If something is too big, break it down and suggest the first part.
+Common issues — skill not triggering, the picker rendering as plain text, steps too large, `/goal` and `Workflow` availability and version requirements, the workflow approval prompt — are covered in `references/troubleshooting.md`.
