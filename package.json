@@ -45,8 +45,6 @@
         "vue-sonner": "^2.0.9"
     },
     "optionalDependencies": {
-        "@rollup/rollup-linux-x64-gnu": "4.62.0",
-        "@rollup/rollup-win32-x64-msvc": "4.62.0",
         "@tailwindcss/oxide-linux-x64-gnu": "^4.3.3",
         "@tailwindcss/oxide-win32-x64-msvc": "^4.3.3",
         "lightningcss-linux-x64-gnu": "^1.33.0",
