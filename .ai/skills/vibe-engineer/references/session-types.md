@@ -12,7 +12,7 @@ Read the existing implementation first. Plan around what's already there — don
 
 ## Bug Fix
 
-Reproduce and understand the bug before fixing. Start by identifying the root cause, then suggest the fix, then suggest a test that would have caught it. Keep the scope tight — don't refactor while fixing. A bug fix session should be short and focused.
+Run the diagnosis loop in `references/bug-diagnosis.md`. The short version: build a feedback loop that goes red on *this* bug before touching any code — no red-capable command, no hypothesis. The loop's phases map onto the session's atomic steps, and the ranked hypotheses map onto the picker. Keep the scope tight — don't refactor while fixing. The grilling for a bug session is short: symptom, expected behavior, when it started, what changed.
 
 ## Refactor
 

@@ -6,7 +6,7 @@ user-invocable: true
 argument-hint: Describe the feature you want to build
 metadata:
   author: Zack
-  version: "2.3.0"
+  version: "2.4.0"
   category: workflow-automation
   tags: coding, incremental, step-through, vibe-engineering
 ---
@@ -49,6 +49,7 @@ Interview the developer relentlessly about every aspect of the feature until you
 - **Ask in rounds.** Each round asks the whole frontier — every question whose prerequisites are already settled. Never ask a question that hinges on an answer you haven't heard yet.
 - **Recommend an answer for every question.** Put your recommendation first. In the picker, the recommended answer is option 1; for genuinely open-ended questions, ask in free text and state your recommendation — don't invent options to fill a picker.
 - **Challenge fuzzy language.** "You said 'account' — Customer or User? Those are different things here." Pin vocabulary to what the codebase actually calls it.
+- **Prototype when talking can't answer.** Some branches only resolve by seeing them ("does this state model feel right?", "which layout?"). Offer to build a throwaway prototype: clearly named as a prototype, trivial to run, no persistence, no polish — it exists to answer the question. Fold the verdict into the plan, then delete it (or park it on a throwaway branch). Never let prototype code leak into the session's real file set.
 - **Exit condition:** the grilling ends when every branch of the design tree is resolved — no open decisions, no ambiguous terms, no unstated edge cases. Then, and only then, write the plan. If the developer says "just plan it" or "stop grilling", answer the remaining branches with your own recommendations, mark them as assumptions in the plan, and move on.
 
 ### Plan format
