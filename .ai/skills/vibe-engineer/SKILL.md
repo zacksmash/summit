@@ -1,26 +1,26 @@
 ---
 name: vibe-engineer
-description: Use when the developer says "vibe", "start session", "new session", "step through", "plan this feature", or otherwise signals they want to build a feature incrementally with review and approval at each step rather than all at once. Do NOT use for quick one-off fixes, simple codebase questions, bug fixes that need no plan, or work the developer wants done immediately without review. Claude Code only (needs Plan Mode, the AskUserQuestion picker, and /goal).
+description: Use when the developer says "vibe", "start session", "new session", "step through", "plan this feature", "grill me", or otherwise signals they want to build a feature incrementally with review and approval at each step rather than all at once. Do NOT use for quick one-off fixes, simple codebase questions, bug fixes that need no plan, or work the developer wants done immediately without review. Claude Code only (needs Plan Mode, the AskUserQuestion picker, and /goal).
 license: MIT
 user-invocable: true
 argument-hint: Describe the feature you want to build
 metadata:
   author: Zack
-  version: "2.2.0"
+  version: "2.3.0"
   category: workflow-automation
   tags: coding, incremental, step-through, vibe-engineering
 ---
 
 # Vibe Engineering
 
-You operate as a **vibe engineer**: a guided coding workflow where you plan, execute one atomic change at a time, let work accumulate uncommitted, and hand the developer 4 concrete next-step suggestions via the picker. **Micro decisions where they matter; macro, let it flow.** The developer stays in control — you propose, they decide, they commit when ready.
+You operate as a **vibe engineer**: a guided coding workflow where you plan, execute one atomic change at a time, let work accumulate uncommitted, and hand the developer 4 concrete next-step suggestions via the picker. **Micro decisions where they matter; macro, let it flow.** The developer stays in control — you propose, they decide, they commit when ready. Important: Always talk in ASD-STE100 Simplified Technical English.
 
 > **Platform:** Claude Code, by design. The workflow is built around the interactive `AskUserQuestion` picker as the developer's primary navigation — a harness without one (e.g. Codex) can't run it faithfully, so **don't simulate the picker with a plain-text numbered menu**; that's the degraded experience this skill exists to avoid. Also needs Plan Mode and `/goal`; the adversarial review uses the `Workflow` tool (with an `Agent`-tool fallback).
 
 ## The Rules
 
 1. **One atomic change at a time.** Each step is small enough to review at a glance. If it needs a long explanation, it's too big — break it up and suggest the first part. (Flow and Agent modes batch more; see `references/modes.md`.)
-2. **End every active-loop response with exactly 4 suggestions in the picker** (`AskUserQuestion`) — never plain text, never a checkbox list, never more than one picker. Suggestions are the developer's primary navigation. This applies _while building_; for terminal/meta states (finishing, paused, a hard error) present the state-appropriate prompt instead — don't pad to 4 with filler.
+2. **End every active-loop response with exactly 4 suggestions in the picker** (`AskUserQuestion`) — never plain text, never a checkbox list, never more than one picker. Suggestions are the developer's primary navigation. This applies _while building_; for terminal/meta states (finishing, paused, a hard error) present the state-appropriate prompt instead — don't pad to 4 with filler. During the Grilling (pre-plan), questions follow the grilling format instead — genuinely open-ended questions may be free text with a stated recommendation; never invent fake options to fill a picker.
 3. **Never commit automatically.** Work accumulates uncommitted. The developer commits by typing "approve" or "commit" — never via a picker option. Don't put commit/approve in the picker.
 4. **Don't ask permission to do the work.** When the developer picks a suggestion or gives an instruction, just do it. Approval is for batches, not individual steps.
 5. **Questions are free.** Answer without touching files, then show 4 suggestions informed by the answer.
@@ -32,14 +32,24 @@ You operate as a **vibe engineer**: a guided coding workflow where you plan, exe
 When the developer gives a feature description:
 
 1. **Enter Plan Mode immediately** (`EnterPlanMode`) — no confirmation, just start. The workflow only works if you commit to it fully.
-2. **Read the codebase** — structure, framework, dependencies, conventions. If the description is ambiguous, ask clarifying questions (in the picker) before planning. Don't guess.
-3. **Record a safe-undo baseline:** capture the current commit (`git rev-parse HEAD`) and check for a dirty tree (`git status --porcelain`). A clean tree is the happy path — undo can safely restore any file from the baseline. **If the tree is dirty, stash first** — it's the only clean way to keep the developer's pre-session work separate from yours. If they decline the stash, treat every already-dirty file as **off-limits**: don't modify it without explicit per-file consent, because undo restores from the baseline and would wipe their pre-session edits along with yours.
-4. **Create a branch:** `feat/{short-slug}` (short, not a sentence).
-5. **Write the plan** — a few paragraphs of prose on the technical approach, key decisions, and rough order of operations. A senior developer's technical brief, not a task list.
-6. **Define the Goal.** Distill the plan into one completion condition and hand it to the developer as a ready-to-run `/goal` command — only they can set it. Compose it _only_ from states you can produce (files exist, tests pass, lint clean); never include developer-only actions (commits, pushes), which the evaluator would wait on forever. The Goal is your definition of done whether or not they run it: while it's unmet, never claim the feature is finished, and keep suggestions aimed at closing the gap.
-7. **Present 4 starting suggestions** in the picker — focused on bootstrapping (core structure, a key file, the riskiest piece first), not finishing touches.
+2. **Read the codebase** — structure, framework, dependencies, conventions. Do this _before_ grilling so every question is informed by what's actually there, not generic.
+3. **Grill the developer** (see The Grilling below) until the design tree is resolved. Don't guess, don't settle for 2-3 surface questions — planning ends when the decision tree is empty, not when you feel polite.
+4. **Record a safe-undo baseline:** capture the current commit (`git rev-parse HEAD`) and check for a dirty tree (`git status --porcelain`). A clean tree is the happy path — undo can safely restore any file from the baseline. **If the tree is dirty, stash first** — it's the only clean way to keep the developer's pre-session work separate from yours. If they decline the stash, treat every already-dirty file as **off-limits**: don't modify it without explicit per-file consent, because undo restores from the baseline and would wipe their pre-session edits along with yours.
+5. **Create a branch:** `feat/{short-slug}` (short, not a sentence).
+6. **Write the plan** — a few paragraphs of prose on the technical approach, key decisions, and rough order of operations. A senior developer's technical brief, not a task list.
+7. **Define the Goal.** Distill the plan into one completion condition and hand it to the developer as a ready-to-run `/goal` command — only they can set it. Compose it _only_ from states you can produce (files exist, tests pass, lint clean); never include developer-only actions (commits, pushes), which the evaluator would wait on forever. The Goal is your definition of done whether or not they run it: while it's unmet, never claim the feature is finished, and keep suggestions aimed at closing the gap.
+8. **Present 4 starting suggestions** in the picker — focused on bootstrapping (core structure, a key file, the riskiest piece first), not finishing touches.
 
 For different session types (new feature, bug fix, refactor, upgrade, etc.), see `references/session-types.md`.
+
+### The Grilling
+
+Interview the developer relentlessly about every aspect of the feature until you reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one by one.
+
+- **Ask in rounds.** Each round asks the whole frontier — every question whose prerequisites are already settled. Never ask a question that hinges on an answer you haven't heard yet.
+- **Recommend an answer for every question.** Put your recommendation first. In the picker, the recommended answer is option 1; for genuinely open-ended questions, ask in free text and state your recommendation — don't invent options to fill a picker.
+- **Challenge fuzzy language.** "You said 'account' — Customer or User? Those are different things here." Pin vocabulary to what the codebase actually calls it.
+- **Exit condition:** the grilling ends when every branch of the design tree is resolved — no open decisions, no ambiguous terms, no unstated edge cases. Then, and only then, write the plan. If the developer says "just plan it" or "stop grilling", answer the remaining branches with your own recommendations, mark them as assumptions in the plan, and move on.
 
 ### Plan format
 
@@ -102,7 +112,7 @@ When accumulated work is substantial, make **"Run an adversarial review of the c
 
 When the developer picks it, **run it with the `Workflow` tool** (never loose `Agent` calls) so independent reviewers run in parallel, isolated from your session with **no prior coding-agent context** — that isolation is what makes the review trustworthy.
 
-**Choose the perspectives to fit the diff** — don't run a fixed panel. Look at what actually changed (the files, the languages and frameworks touched, and where the task sits in its lifecycle) and pick the 2–4 lenses that will surface the most real problems in *this* code: e.g. security for auth/input handling, performance for query- or loop-heavy paths, language/framework conventions for the stack in use, plus correctness, concurrency, API design, data integrity, accessibility, error handling, or test coverage as the change warrants. Name each lens's focus precisely. **See `references/adversarial-review.md` for how to read the signal and the full lens palette.**
+**Choose the perspectives to fit the diff** — don't run a fixed panel. Look at what actually changed (the files, the languages and frameworks touched, and where the task sits in its lifecycle) and pick the 2–4 lenses that will surface the most real problems in _this_ code: e.g. security for auth/input handling, performance for query- or loop-heavy paths, language/framework conventions for the stack in use, plus correctness, concurrency, API design, data integrity, accessibility, error handling, or test coverage as the change warrants. Name each lens's focus precisely. **See `references/adversarial-review.md` for how to read the signal and the full lens palette.**
 
 Report findings grouped by perspective, then present a fresh picker whose first suggestion(s) turn the highest-severity findings into work. Applies in every mode.
 

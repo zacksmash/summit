@@ -2,7 +2,7 @@
 
 ## Skill doesn't trigger
 
-If "start session" or "plan this feature" doesn't load the skill: invoke it directly with `/vibe-engineerw`, and check that the skill is enabled in settings.
+If "start session" or "plan this feature" doesn't load the skill: invoke it directly with `/vibe-engineer`, and check that the skill is enabled in settings.
 
 ## UI picker appears as plain text
 
