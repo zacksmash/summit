@@ -31,7 +31,7 @@ test('keeps the portable and machine-specific setup workflows separate', functio
 
     $setup = implode("\n", $composer['scripts']['setup']);
     $octaneSetup = implode("\n", $composer['scripts']['setup:octane']);
-    $localSetup = implode("\n", $composer['scripts']['setup:local']);
+    $toolsSetup = implode("\n", $composer['scripts']['setup:tools']);
 
     expect($setup)
         ->toContain('composer install')
@@ -46,13 +46,16 @@ test('keeps the portable and machine-specific setup workflows separate', functio
         ->not->toContain('ide-helper')
         ->and($octaneSetup)
         ->toContain('octane:install --server=frankenphp')
-        ->and($localSetup)
+        ->and($toolsSetup)
+        ->toStartWith('git init -q')
         ->toContain('@setup:octane')
         ->toContain('herd secure')
         ->toContain('herd proxy')
         ->toContain('playwright install')
         ->toContain('whisky install')
-        ->toContain('ide-helper:generate');
+        ->toContain('ide-helper:generate')
+        ->toContain('npm run format')
+        ->toEndWith('git diff --cached --quiet || git commit -m "Initial commit"');
 });
 
 test('falls back to the Laravel development server without an Octane runtime', function () {

@@ -39,10 +39,10 @@ Install the FrankenPHP runtime for Octane on macOS, Linux, or Windows via WSL:
 composer setup:octane
 ```
 
-Run the complete opinionated local setup, including Octane, Whisky, IDE Helper, Playwright, and Laravel Herd HTTPS proxying:
+Run the complete opinionated tooling setup, including Octane, Whisky, IDE Helper, Playwright, and Laravel Herd HTTPS proxying:
 
 ```bash
-composer setup:local
+composer setup:tools
 ```
 
-The local setup requires Laravel Herd. Without an installed Octane runtime, `composer dev` automatically uses Laravel's built-in development server.
+The tooling setup requires Laravel Herd. It initializes a Git repository when needed, installs the Git hooks, and creates an initial commit after all setup and checks succeed. Without an installed Octane runtime, `composer dev` automatically uses Laravel's built-in development server.

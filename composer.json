@@ -64,13 +64,17 @@
         "setup:octane": [
             "@php artisan octane:install --server=frankenphp --no-interaction"
         ],
-        "setup:local": [
+        "setup:tools": [
+            "git init -q",
             "@setup:octane",
             "vendor/bin/whisky install --no-interaction",
             "@php artisan ide-helper:generate",
             "npx playwright install",
             "herd secure --no-interaction",
-            "herd proxy \"$(basename \"$PWD\")\" http://127.0.0.1:8000 --secure --no-interaction"
+            "herd proxy \"$(basename \"$PWD\")\" http://127.0.0.1:8000 --secure --no-interaction",
+            "npm run format",
+            "git add --all",
+            "git diff --cached --quiet || git commit -m \"Initial commit\""
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
