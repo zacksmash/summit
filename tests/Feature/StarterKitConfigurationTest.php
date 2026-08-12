@@ -16,7 +16,9 @@ test('defines the Laravel community starter kit contract', function () {
         ->and($composer['extra']['laravel']['installer']['post-create-project'])
         ->toBe(['@php artisan install:features --ansi'])
         ->and($composer['scripts']['post-create-project-cmd'])
-        ->toContain('@php artisan passport:keys --no-interaction --ansi');
+        ->toContain('@php artisan passport:keys --no-interaction --ansi')
+        ->and(file_get_contents(dirname(__DIR__, 2).'/chisel.php'))
+        ->toContain("'tests/Feature/StarterKitConfigurationTest.php'");
 });
 
 test('keeps the portable and machine-specific setup workflows separate', function () {

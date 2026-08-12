@@ -315,5 +315,6 @@ return Chisel::script(__DIR__)
             'app/Console/Commands/InstallFeaturesCommand.php',
             'chisel.php',
             'chisel-paths.php',
+            'tests/Feature/StarterKitConfigurationTest.php',
         )->delete();
     });
