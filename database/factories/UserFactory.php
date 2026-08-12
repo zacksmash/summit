@@ -2,8 +2,10 @@
 
 namespace Database\Factories;
 
+/* @chisel-teams */
 use App\Enums\TeamRole;
 use App\Models\Team;
+/* @end-chisel-teams */
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -40,6 +42,7 @@ class UserFactory extends Factory
         ];
     }
 
+    /* @chisel-teams */
     /**
      * Configure the model factory.
      */
@@ -58,6 +61,7 @@ class UserFactory extends Factory
             $user->switchTeam($team);
         });
     }
+    /* @end-chisel-teams */
 
     /**
      * Indicate that the model's email address should be unverified.

@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
+/* @chisel-teams */
 import PendingInvitationsModal from '@/components/PendingInvitationsModal.vue';
+/* @end-chisel-teams */
 import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
 import { dashboard } from '@/routes';
+/* @chisel-teams */
 import type { DashboardInvitation, Team } from '@/types';
 
 defineProps<{
     pendingInvitations?: DashboardInvitation[];
 }>();
+/* @end-chisel-teams */
 
 defineOptions({
     layout: (props: { currentTeam?: Team | null }) => ({
@@ -26,10 +30,12 @@ defineOptions({
 <template>
     <Head title="Dashboard" />
 
+    <!-- @chisel-teams -->
     <PendingInvitationsModal
         v-if="pendingInvitations && pendingInvitations.length > 0"
         :invitations="pendingInvitations"
     />
+    <!-- @end-chisel-teams -->
 
     <div
         class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"

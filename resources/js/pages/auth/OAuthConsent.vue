@@ -80,8 +80,7 @@ function onDenySubmit(): void {
                     </CardTitle>
 
                     <CardDescription>
-                        This application will be able to:<br />Use available MCP
-                        functionality.
+                        Review the permissions requested by this application.
                     </CardDescription>
                 </CardHeader>
 

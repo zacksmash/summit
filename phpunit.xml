@@ -11,9 +11,11 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
+        <!-- @chisel-browser-testing -->
         <testsuite name="Browser">
             <directory>tests/Browser</directory>
         </testsuite>
+        <!-- @end-chisel-browser-testing -->
     </testsuites>
     <source>
         <include>

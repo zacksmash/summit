@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+/* @chisel-teams */
 use App\Http\Middleware\SetTeamUrlDefaults;
+/* @end-chisel-teams */
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,7 +16,9 @@ use Illuminate\Http\Request;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        /* @chisel-oauth-api */
         api: __DIR__.'/../routes/api.php',
+        /* @end-chisel-oauth-api */
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
@@ -25,7 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+            /* @chisel-teams */
             SetTeamUrlDefaults::class,
+            /* @end-chisel-teams */
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

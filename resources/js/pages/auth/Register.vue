@@ -2,7 +2,9 @@
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
+/* @chisel-teams */
 import TeamInvitationAlert from '@/components/TeamInvitationAlert.vue';
+/* @end-chisel-teams */
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,11 +12,15 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
+/* @chisel-teams */
 import type { TeamInvitationContext } from '@/types';
+/* @end-chisel-teams */
 
 defineProps<{
     passwordRules: string;
+    /* @chisel-teams */
     teamInvitation?: TeamInvitationContext | null;
+    /* @end-chisel-teams */
 }>();
 
 defineOptions({
@@ -28,11 +34,13 @@ defineOptions({
 <template>
     <Head title="Register" />
 
+    <!-- @chisel-teams -->
     <TeamInvitationAlert
         v-if="teamInvitation"
         :invitation="teamInvitation"
         action="Register"
     />
+    <!-- @end-chisel-teams -->
 
     <Form
         v-bind="store.form()"

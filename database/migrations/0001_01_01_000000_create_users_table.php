@@ -21,11 +21,13 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        /* @chisel-password-reset */
         Schema::create('password_reset_tokens', function (Blueprint $table): void {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
+        /* @end-chisel-password-reset */
 
         Schema::create('sessions', function (Blueprint $table): void {
             $table->string('id')->primary();
@@ -43,7 +45,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('users');
+        /* @chisel-password-reset */
         Schema::dropIfExists('password_reset_tokens');
+        /* @end-chisel-password-reset */
         Schema::dropIfExists('sessions');
     }
 };

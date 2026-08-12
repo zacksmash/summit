@@ -6,7 +6,9 @@ import { dashboard, login } from '@/routes';
 import { register } from '@/routes';
 /* @end-chisel-registration */
 
+/* @chisel-teams */
 const page = usePage();
+/* @end-chisel-teams */
 const dashboardUrl = computed(() =>
     page.props.currentTeam ? dashboard(page.props.currentTeam.slug).url : '/',
 );

@@ -1,14 +1,18 @@
 <?php
 
+/* @chisel-teams */
 use App\Enums\TeamRole;
 use App\Models\Team;
 use App\Models\TeamInvitation;
+/* @end-chisel-teams */
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('guests are redirected to the login page', function () {
     $user = User::factory()->create();
+    /* @chisel-teams */
     $team = $user->currentTeam;
+    /* @end-chisel-teams */
 
     $response = $this->get(route('dashboard'));
     $response->assertRedirect(route('login'));
@@ -16,7 +20,9 @@ test('guests are redirected to the login page', function () {
 
 test('authenticated users can visit the dashboard', function () {
     $user = User::factory()->create();
+    /* @chisel-teams */
     $team = $user->currentTeam;
+    /* @end-chisel-teams */
 
     $response = $this
         ->actingAs($user)
@@ -25,6 +31,7 @@ test('authenticated users can visit the dashboard', function () {
     $response->assertOk();
 });
 
+/* @chisel-teams */
 test('dashboard includes pending invitations for the authenticated user', function () {
     $owner = User::factory()->create(['name' => 'Taylor Otwell']);
     $invitedUser = User::factory()->create(['email' => 'invited@example.com']);
@@ -133,3 +140,4 @@ test('dashboard does not include or delete other users invitations', function ()
         'id' => $invitation->id,
     ]);
 });
+/* @end-chisel-teams */

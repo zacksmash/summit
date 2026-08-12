@@ -2,6 +2,7 @@
 
 use App\Providers\AppServiceProvider;
 use Illuminate\Foundation\DevCommands;
+use Laravel\Chisel\Script;
 
 test('defines the Laravel community starter kit contract', function () {
     $composer = json_decode(
@@ -19,6 +20,24 @@ test('defines the Laravel community starter kit contract', function () {
         ->toContain('@php artisan passport:keys --no-interaction --ansi')
         ->and(file_get_contents(dirname(__DIR__, 2).'/chisel.php'))
         ->toContain("'tests/Feature/StarterKitConfigurationTest.php'");
+});
+
+test('offers all bundled features as default Chisel selections', function () {
+    /** @var Script $script */
+    $script = require dirname(__DIR__, 2).'/chisel.php';
+
+    $questions = collect($script->questions())->keyBy('name');
+
+    expect($questions->keys()->all())->toBe([
+        'auth_features',
+        'application_features',
+        'development_features',
+    ])->and($questions['auth_features']->default)
+        ->toBe(array_keys($questions['auth_features']->options))
+        ->and($questions['application_features']->default)
+        ->toBe(array_keys($questions['application_features']->options))
+        ->and($questions['development_features']->default)
+        ->toBe(array_keys($questions['development_features']->options));
 });
 
 test('keeps the portable and machine-specific setup workflows separate', function () {
@@ -58,6 +77,7 @@ test('keeps the portable and machine-specific setup workflows separate', functio
         ->toEndWith('git diff --cached --quiet || git commit -m "Initial commit"');
 });
 
+/* @chisel-octane */
 test('falls back to the Laravel development server without an Octane runtime', function () {
     config()->set('octane.server', 'unavailable');
 
@@ -67,3 +87,4 @@ test('falls back to the Laravel development server without an Octane runtime', f
 
     expect($server['command'])->toBe('php artisan serve');
 });
+/* @end-chisel-octane */

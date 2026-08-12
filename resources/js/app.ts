@@ -12,12 +12,16 @@ createInertiaApp({
     layout: (name) => {
         switch (true) {
             case name === 'Welcome':
+            /* @chisel-oauth-api */
             case name === 'auth/OAuthConsent':
+                /* @end-chisel-oauth-api */
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('settings/'):
+            /* @chisel-teams */
             case name.startsWith('teams/'):
+                /* @end-chisel-teams */
                 return [AppLayout, SettingsLayout];
             default:
                 return AppLayout;

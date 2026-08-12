@@ -10,7 +10,7 @@ Create a fresh application with the Laravel installer:
 laravel new my-project --using=zacksmash/summit
 ```
 
-The installer creates the environment file and SQLite database, generates the application key and Passport keys, runs the migrations, and launches Chisel so you can select the starter-kit features you want.
+The installer creates the environment file and SQLite database, generates the application key and Passport keys, runs the migrations, and launches Chisel. Chisel lets you choose authentication features, teams, Passport, application MCP scaffolding, Octane, browser testing, AI tooling, IDE Helper, Whisky, and Herd integration.
 
 Then start local development:
 
