@@ -45,4 +45,4 @@ Run the complete opinionated tooling setup, including Octane, Whisky, IDE Helper
 composer setup:tools
 ```
 
-The tooling setup requires Laravel Herd. It initializes a Git repository when needed, installs the Git hooks, and creates an initial commit after all setup and checks succeed. Without an installed Octane runtime, `composer dev` automatically uses Laravel's built-in development server.
+The tooling setup requires Laravel Herd. It initializes a Git repository when needed, installs the Git hooks, and creates the generated baseline with a one-time `--no-verify` commit after setup succeeds. Later commits run Whisky normally. Without an installed Octane runtime, `composer dev` automatically uses Laravel's built-in development server.

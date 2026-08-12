@@ -74,7 +74,7 @@
             "herd proxy \"$(basename \"$PWD\")\" http://127.0.0.1:8000 --secure --no-interaction",
             "npm run format",
             "git add --all",
-            "git diff --cached --quiet || git commit -m \"Initial commit\""
+            "git diff --cached --quiet || git commit --no-verify -m \"Initial commit\""
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",

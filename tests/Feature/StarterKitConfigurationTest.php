@@ -74,7 +74,7 @@ test('keeps the portable and machine-specific setup workflows separate', functio
         ->toContain('whisky install')
         ->toContain('ide-helper:generate')
         ->toContain('npm run format')
-        ->toEndWith('git diff --cached --quiet || git commit -m "Initial commit"');
+        ->toEndWith('git diff --cached --quiet || git commit --no-verify -m "Initial commit"');
 });
 
 /* @chisel-octane */
