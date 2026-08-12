@@ -1,15 +1,48 @@
-# Get Started
+# Summit
 
-Getting started with Summit is super easy. Just start a new Laravel project, and use the Summit repo as your starter kit
+Summit is an opinionated Laravel Vue starter kit.
+
+## Create a project
+
+Create a fresh application with the Laravel installer:
 
 ```bash
 laravel new my-project --using=zacksmash/summit
 ```
 
-Then, `cd` into `my-project` and run
+The installer creates the environment file and SQLite database, generates the application key and Passport keys, runs the migrations, and launches Chisel so you can select the starter-kit features you want.
+
+Then start local development:
+
+```bash
+cd my-project
+composer dev
+```
+
+If you pass `--no-node` to `laravel new`, install and build the frontend separately with `npm install && npm run build`.
+
+## Set up a cloned repository
+
+For a direct Git clone instead of a Laravel installer project, run:
 
 ```bash
 composer setup
 ```
 
-Now, you're all setup with Laravel Octane over HTTPS! Just run `composer dev` for local development and happy coding!
+This performs the same portable application setup without requiring Herd or resetting an existing database.
+
+## Optional local tooling
+
+Install the FrankenPHP runtime for Octane on macOS, Linux, or Windows via WSL:
+
+```bash
+composer setup:octane
+```
+
+Run the complete opinionated local setup, including Octane, Whisky, IDE Helper, Playwright, and Laravel Herd HTTPS proxying:
+
+```bash
+composer setup:local
+```
+
+The local setup requires Laravel Herd. Without an installed Octane runtime, `composer dev` automatically uses Laravel's built-in development server.

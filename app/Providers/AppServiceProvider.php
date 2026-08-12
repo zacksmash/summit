@@ -11,6 +11,7 @@ use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Laravel\Passport\Passport;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Process\ExecutableFinder;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -40,9 +41,22 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function registerDevCommands(): void
     {
-        DevCommands::except('server');
+        if (! $this->octaneServerIsAvailable()) {
+            DevCommands::artisan('serve', 'server');
+        }
+    }
 
-        DevCommands::artisan('octane:start --watch', 'octane')->orange();
+    /**
+     * Determine whether the configured Octane server can run locally.
+     */
+    protected function octaneServerIsAvailable(): bool
+    {
+        return match ((string) config('octane.server')) {
+            'frankenphp' => (new ExecutableFinder)->find('frankenphp', null, [base_path()]) !== null,
+            'roadrunner' => (new ExecutableFinder)->find('rr', null, [base_path()]) !== null,
+            'swoole' => extension_loaded('swoole') || extension_loaded('openswoole'),
+            default => false,
+        };
     }
 
     /**

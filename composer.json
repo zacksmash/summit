@@ -2,10 +2,11 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "zacksmash/summit",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "An opinionated Laravel Vue starter kit.",
     "keywords": [
         "laravel",
-        "framework"
+        "starter-kit",
+        "vue"
     ],
     "license": "MIT",
     "require": {
@@ -51,22 +52,25 @@
     },
     "scripts": {
         "setup": [
-            "git init -q",
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
+            "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+            "@php artisan passport:keys --no-interaction",
             "@php artisan migrate --force",
+            "npm install",
+            "npm run build"
+        ],
+        "setup:octane": [
+            "@php artisan octane:install --server=frankenphp --no-interaction"
+        ],
+        "setup:local": [
+            "@setup:octane",
             "vendor/bin/whisky install --no-interaction",
             "@php artisan ide-helper:generate",
-            "@php artisan passport:keys --no-interaction --force",
-            "npm install",
             "npx playwright install",
-            "npm run build",
             "herd secure --no-interaction",
-            "herd proxy \"$(basename \"$PWD\")\" http://127.0.0.1:8000 --secure --no-interaction",
-            "@php artisan octane:install --server=frankenphp",
-            "@php artisan migrate:fresh --seed --force",
-            "echo \"Setup complete! Run 'composer dev' to start the development environment.\""
+            "herd proxy \"$(basename \"$PWD\")\" http://127.0.0.1:8000 --secure --no-interaction"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
@@ -116,6 +120,7 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+            "@php artisan passport:keys --no-interaction --ansi",
             "@php artisan migrate --graceful --ansi"
         ],
         "pre-package-uninstall": [
