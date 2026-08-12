@@ -80,6 +80,10 @@
             "Composer\\Config::disableProcessTimeout",
             "@php artisan dev"
         ],
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx dotenv-cli -- npx @laravel/multiplex 'server@yellow,php artisan octane:start --watch' 'queue@blue,php artisan queue:listen --tries=1 --timeout=0' 'logs@magenta,php artisan pail --timeout=0' 'tunnel@black,sh -c \"ngrok http --url=$NGROK_URL 443\"' 'vite@green,vite build'"
+        ],
         "lint": [
             "pint --parallel",
             "rector"
