@@ -53,6 +53,10 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function registerDevCommands(): void
     {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
         if (! $this->octaneServerIsAvailable()) {
             DevCommands::artisan('serve', 'server');
         }

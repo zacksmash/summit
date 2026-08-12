@@ -607,7 +607,8 @@ return Chisel::script(__DIR__)
                     "        \"setup:octane\": [\n            \"@php artisan octane:install --server=frankenphp --no-interaction\"\n        ],\n",
                     '',
                 )
-                ->removeLinesContaining('"@setup:octane"');
+                ->removeLinesContaining('"@setup:octane"')
+                ->replace('php artisan octane:start --watch', 'php artisan serve');
 
             $c->file('.gitignore')
                 ->removeLinesContaining('frankenphp');
@@ -691,10 +692,9 @@ return Chisel::script(__DIR__)
             $composerPackages[] = 'laravel/passport';
         }
 
-        if (
-            ! chiselSelected($answers, 'application_features', 'mcp')
-            && ! chiselSelected($answers, 'development_features', 'ai-tooling')
-        ) {
+        if (! chiselSelected($answers, 'application_features', 'mcp')) {
+            // Boost declares its own laravel/mcp dependency, so the app-level
+            // requirement can go even when the AI tooling stays.
             $composerPackages[] = 'laravel/mcp';
         }
 
@@ -723,7 +723,11 @@ return Chisel::script(__DIR__)
 
         $c->file('composer.json')
             ->replace(
-                "            \"@php artisan install:features --ansi\",\n            \"@php artisan vendor:publish --tag=laravel-assets --ansi --force\"",
+                "            \"@php artisan boost:update --env=local --ansi\",\n            \"@php artisan install:features --ansi\"",
+                '            "@php artisan boost:update --env=local --ansi"',
+            )
+            ->replace(
+                "            \"@php artisan vendor:publish --tag=laravel-assets --ansi --force\",\n            \"@php artisan install:features --ansi\"",
                 '            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"',
             )
             ->replace(
@@ -739,10 +743,21 @@ return Chisel::script(__DIR__)
         chiselRemoveComposerPackages($composerPackages);
         chiselRun(['composer', 'dump-autoload', '--no-interaction'], 'Refresh Composer Autoload');
 
+        // The installer migrates before Chisel deletes deselected migrations, so
+        // rebuild the schema from the surviving ones. The clone flow has no
+        // database yet at this point; its later migrate only sees survivors.
+        if (file_exists(__DIR__.'/database/database.sqlite')) {
+            chiselRun(['php', 'artisan', 'migrate:fresh', '--force', '--no-interaction'], 'Rebuild Database Schema');
+        }
+
         chiselRun(['composer', 'lint'], 'Composer Lint');
         chiselRun(['php', 'artisan', 'wayfinder:generate', '--with-form', '--no-interaction'], 'Generate Wayfinder Resources');
 
         if (! chiselSkipsNode()) {
+            if (chiselSelected($answers, 'development_features', 'browser-testing')) {
+                chiselRun(['npx', 'playwright', 'install'], 'Install Playwright Browsers');
+            }
+
             $c->npm()->run('lint');
             $c->npm()->run('format');
         }
@@ -760,4 +775,16 @@ return Chisel::script(__DIR__)
             'chisel-paths.php',
             'tests/Feature/StarterKitConfigurationTest.php',
         )->delete();
+
+        // Chisel's classes are loaded in memory while this script runs, so the
+        // toolkit must be removed last, after every consumer above is gone.
+        chiselRun([
+            'composer',
+            'remove',
+            'laravel/chisel',
+            '--no-interaction',
+            '--no-scripts',
+            '--no-audit',
+            '--minimal-changes',
+        ], 'Remove Laravel Chisel');
     });

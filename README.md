@@ -10,7 +10,7 @@ Create a fresh application with the Laravel installer:
 laravel new my-project --using=zacksmash/summit
 ```
 
-The installer creates the environment file and SQLite database, generates the application key and Passport keys, runs the migrations, and launches Chisel. Chisel lets you choose authentication features, teams, Passport, application MCP scaffolding, Octane, browser testing, AI tooling, IDE Helper, Whisky, and Herd integration.
+The installer creates the environment file and SQLite database, generates the application key and Passport keys, runs the migrations, and launches Chisel. Chisel lets you choose authentication features, teams, Passport, application MCP scaffolding, Octane, browser testing, AI tooling, IDE Helper, Whisky, and Herd integration. It removes everything you deselect and rebuilds the database schema to match. The feature selection needs an interactive terminal; in a non-interactive session it is skipped, and you can run it later with `php artisan install:features`.
 
 Then start local development:
 
@@ -29,7 +29,7 @@ For a direct Git clone instead of a Laravel installer project, run:
 composer setup
 ```
 
-This performs the same portable application setup without requiring Herd or resetting an existing database.
+This installs the dependencies, creates the environment file and keys, migrates and seeds the database, installs the Playwright browsers, and builds the frontend — without requiring Herd or resetting an existing database. It is safe to run again. The first dependency install also launches the Chisel feature selection when a terminal is attached.
 
 ## Optional local tooling
 
@@ -45,4 +45,4 @@ Run the complete opinionated tooling setup, including Octane, Whisky, IDE Helper
 composer setup:tools
 ```
 
-The tooling setup requires Laravel Herd. It initializes a Git repository when needed, installs the Git hooks, and creates the generated baseline with a one-time `--no-verify` commit after setup succeeds. Later commits run Whisky normally. Without an installed Octane runtime, `composer dev` automatically uses Laravel's built-in development server.
+The tooling setup requires Laravel Herd and a POSIX shell (macOS, Linux, or Windows via WSL). It initializes a Git repository when needed, installs the Git hooks, and creates the generated baseline with a one-time `--no-verify` commit after setup succeeds. Later commits run Whisky normally. Without an installed Octane runtime, `composer dev` automatically uses Laravel's built-in development server.

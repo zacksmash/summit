@@ -56,9 +56,10 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
-            "@php artisan passport:keys --no-interaction",
+            "@php artisan passport:keys --no-interaction --force",
             "@php artisan migrate --seed --force",
             "npm install",
+            "npx playwright install",
             "npm run build"
         ],
         "setup:octane": [
@@ -73,8 +74,7 @@
             "herd secure --no-interaction",
             "herd proxy \"$(basename \"$PWD\")\" http://127.0.0.1:8000 --secure --no-interaction",
             "npm run format",
-            "git add --all",
-            "git diff --cached --quiet || git commit --no-verify -m \"Initial commit\""
+            "git rev-parse -q --verify HEAD >/dev/null 2>&1 || (git add --all && git commit --no-verify -m \"Initial commit\")"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
@@ -82,7 +82,7 @@
         ],
         "serve": [
             "Composer\\Config::disableProcessTimeout",
-            "npx dotenv-cli -- npx @laravel/multiplex 'server@yellow,php artisan octane:start --watch' 'queue@blue,php artisan queue:listen --tries=1 --timeout=0' 'logs@magenta,php artisan pail --timeout=0' 'tunnel@black,sh -c \"ngrok http --url=$NGROK_URL 443\"' 'vite@green,vite build'"
+            "npx @laravel/multiplex 'server@yellow,php artisan octane:start --watch' 'queue@blue,php artisan queue:listen --tries=1 --timeout=0' 'logs@magenta,php artisan pail --timeout=0' 'vite@green,vite build'"
         ],
         "lint": [
             "pint --parallel",
@@ -118,9 +118,9 @@
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan install:features --ansi",
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-            "@php artisan boost:update --env=local --ansi"
+            "@php artisan boost:update --env=local --ansi",
+            "@php artisan install:features --ansi"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

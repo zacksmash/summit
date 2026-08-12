@@ -29,6 +29,15 @@ class InstallFeaturesCommand extends Command
             return self::SUCCESS;
         }
 
+        if ($this->option('answers') === null && ! $this->input->isInteractive()) {
+            $this->components->warn(
+                'Skipping starter kit feature selection because the session is not interactive.'
+                .' Run [php artisan install:features] from a terminal, or pass [--answers] to select features without prompts.',
+            );
+
+            return self::SUCCESS;
+        }
+
         /** @var Script $script */
         $script = require base_path('chisel.php');
 
