@@ -106,6 +106,7 @@
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
+            "@php artisan install:features --ansi",
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan boost:update --env=local --ansi"
         ],
@@ -125,7 +126,9 @@
         "laravel": {
             "dont-discover": [],
             "installer": {
-                "post-create-project": []
+                "post-create-project": [
+                    "@php artisan install:features --ansi"
+                ]
             }
         }
     },

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
+/* @chisel-passkeys */
 import PasskeyVerify from '@/components/PasskeyVerify.vue';
+/* @end-chisel-passkeys */
 import PasswordInput from '@/components/PasswordInput.vue';
 import TeamInvitationAlert from '@/components/TeamInvitationAlert.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -10,7 +12,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+/* @chisel-registration */
 import { register } from '@/routes';
+/* @end-chisel-registration */
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 import type { TeamInvitationContext } from '@/types';
@@ -45,7 +49,9 @@ defineProps<{
         action="Log in"
     />
 
+    <!-- @chisel-passkeys -->
     <PasskeyVerify />
+    <!-- @end-chisel-passkeys -->
 
     <Form
         v-bind="store.form()"
@@ -111,6 +117,7 @@ defineProps<{
             </Button>
         </div>
 
+        <!-- @chisel-registration -->
         <div class="text-center text-sm text-muted-foreground">
             Don't have an account?
             <TextLink
@@ -127,5 +134,6 @@ defineProps<{
                 Sign up
             </TextLink>
         </div>
+        <!-- @end-chisel-registration -->
     </Form>
 </template>
