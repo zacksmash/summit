@@ -45,10 +45,12 @@ return [
             'provider' => 'users',
         ],
 
+        /* @chisel-oauth-api */
         'api' => [
             'driver' => 'passport',
             'provider' => 'users',
         ],
+        /* @end-chisel-oauth-api */
     ],
 
     /*

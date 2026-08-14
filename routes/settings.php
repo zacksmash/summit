@@ -2,11 +2,15 @@
 
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
+/* @chisel-teams */
 use App\Http\Controllers\Teams\TeamController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Controllers\Teams\TeamMemberController;
 use App\Http\Middleware\EnsureTeamMembership;
+/* @end-chisel-teams */
+/* @chisel-password-confirmation */
 use Illuminate\Auth\Middleware\RequirePassword;
+/* @end-chisel-password-confirmation */
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function (): void {
@@ -20,7 +24,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('settings/security', [SecurityController::class, 'edit'])
+        /* @chisel-password-confirmation */
         ->middleware(RequirePassword::class)
+        /* @end-chisel-password-confirmation */
         ->name('security.edit');
 
     Route::put('settings/password', [SecurityController::class, 'update'])
@@ -29,6 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
     Route::inertia('settings/appearance', 'settings/Appearance')->name('appearance.edit');
 
+    /* @chisel-teams */
     Route::get('settings/teams', [TeamController::class, 'index'])->name('teams.index');
     Route::post('settings/teams', [TeamController::class, 'store'])->name('teams.store');
 
@@ -45,9 +52,12 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         Route::post('settings/teams/{team}/invitations', [TeamInvitationController::class, 'store'])->name('teams.invitations.store');
         Route::delete('settings/teams/{team}/invitations/{invitation}', [TeamInvitationController::class, 'destroy'])->name('teams.invitations.destroy');
     });
+    /* @end-chisel-teams */
 });
 
+/* @chisel-passkeys */
 Route::get('.well-known/passkey-endpoints', fn () => response()->json([
     'enroll' => route('security.edit'),
     'manage' => route('security.edit'),
 ]))->name('well-known.passkeys');
+/* @end-chisel-passkeys */

@@ -1,5 +1,7 @@
 import type { Auth } from '@/types/auth';
+/* @chisel-teams */
 import type { Team } from '@/types/teams';
+/* @end-chisel-teams */
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
@@ -20,8 +22,10 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             sidebarOpen: boolean;
+            /* @chisel-teams */
             currentTeam: Team | null;
             teams: Team[];
+            /* @end-chisel-teams */
             [key: string]: unknown;
         };
     }

@@ -1,14 +1,21 @@
 <?php
 
+/* @chisel-teams */
 use App\Enums\TeamRole;
 use App\Models\Team;
 use App\Models\TeamInvitation;
+/* @end-chisel-teams */
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Inertia\Testing\AssertableInertia as Assert;
+/* @chisel-2fa */
 use Laravel\Fortify\Features;
+/* @end-chisel-2fa */
+/* @chisel-passkeys */
 use Laravel\Passkeys\Contracts\PasskeyLoginResponse;
+
+/* @end-chisel-passkeys */
 
 test('login screen can be rendered', function () {
     $response = $this->get(route('login'));
@@ -16,6 +23,7 @@ test('login screen can be rendered', function () {
     $response->assertOk();
 });
 
+/* @chisel-teams */
 test('login screen includes team invitation context', function () {
     $owner = User::factory()->create();
     $team = Team::factory()->create(['name' => 'Laravel Team']);
@@ -36,6 +44,7 @@ test('login screen includes team invitation context', function () {
         ->where('teamInvitation.teamName', 'Laravel Team'),
     );
 });
+/* @end-chisel-teams */
 
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
@@ -49,6 +58,8 @@ test('users can authenticate using the login screen', function () {
     $response->assertRedirect(route('dashboard'));
 });
 
+/* @chisel-passkeys */
+/* @chisel-teams */
 test('passkey login response redirects to the current team dashboard', function () {
     $user = User::factory()->create();
 
@@ -62,7 +73,10 @@ test('passkey login response redirects to the current team dashboard', function 
 
     expect($jsonResponse->getData()->redirect)->toBe(route('dashboard', ['current_team' => $user->personalTeam()->slug]));
 });
+/* @end-chisel-teams */
+/* @end-chisel-passkeys */
 
+/* @chisel-2fa */
 test('users with two factor enabled are redirected to two factor challenge', function () {
     if (! Features::canManageTwoFactorAuthentication()) {
         $this->markTestSkipped('Two-factor authentication is not enabled.');
@@ -84,6 +98,7 @@ test('users with two factor enabled are redirected to two factor challenge', fun
     $response->assertSessionHas('login.id', $user->id);
     $this->assertGuest();
 });
+/* @end-chisel-2fa */
 
 test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();

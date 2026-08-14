@@ -2,8 +2,10 @@
 
 namespace Database\Factories;
 
+/* @chisel-teams */
 use App\Enums\TeamRole;
 use App\Models\Team;
+/* @end-chisel-teams */
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -32,12 +34,15 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            /* @chisel-2fa */
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
+            /* @end-chisel-2fa */
         ];
     }
 
+    /* @chisel-teams */
     /**
      * Configure the model factory.
      */
@@ -56,6 +61,7 @@ class UserFactory extends Factory
             $user->switchTeam($team);
         });
     }
+    /* @end-chisel-teams */
 
     /**
      * Indicate that the model's email address should be unverified.
@@ -67,6 +73,7 @@ class UserFactory extends Factory
         ]);
     }
 
+    /* @chisel-2fa */
     /**
      * Indicate that the model has two-factor authentication configured.
      */
@@ -78,4 +85,5 @@ class UserFactory extends Factory
             'two_factor_confirmed_at' => now(),
         ]);
     }
+    /* @end-chisel-2fa */
 }

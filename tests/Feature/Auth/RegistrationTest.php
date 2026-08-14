@@ -1,8 +1,10 @@
 <?php
 
+/* @chisel-teams */
 use App\Enums\TeamRole;
 use App\Models\Team;
 use App\Models\TeamInvitation;
+/* @end-chisel-teams */
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -12,6 +14,7 @@ test('registration screen can be rendered', function () {
     $response->assertOk();
 });
 
+/* @chisel-teams */
 test('registration screen includes team invitation context', function () {
     $owner = User::factory()->create();
     $team = Team::factory()->create(['name' => 'Laravel Team']);
@@ -32,6 +35,7 @@ test('registration screen includes team invitation context', function () {
         ->where('teamInvitation.teamName', 'Laravel Team'),
     );
 });
+/* @end-chisel-teams */
 
 test('new users can register', function () {
     $response = $this->post(route('register.store'), [

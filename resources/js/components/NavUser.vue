@@ -15,13 +15,17 @@ import {
 } from '@/components/ui/sidebar';
 import UserInfo from '@/components/UserInfo.vue';
 import UserMenuContent from '@/components/UserMenuContent.vue';
+/* @chisel-teams */
 import type { Team } from '@/types';
+/* @end-chisel-teams */
 
 const page = usePage();
 const user = page.props.auth.user;
 const { isMobile, state } = useSidebar();
 
+/* @chisel-teams */
 const currentTeam = computed(() => page.props.currentTeam as Team | null);
+/* @end-chisel-teams */
 </script>
 
 <template>

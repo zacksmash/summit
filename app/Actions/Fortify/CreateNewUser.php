@@ -2,11 +2,15 @@
 
 namespace App\Actions\Fortify;
 
+/* @chisel-teams */
 use App\Actions\Teams\CreateTeam;
+/* @end-chisel-teams */
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Models\User;
+/* @chisel-teams */
 use Illuminate\Support\Facades\DB;
+/* @end-chisel-teams */
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
@@ -14,10 +18,12 @@ class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules, ProfileValidationRules;
 
+    /* @chisel-teams */
     public function __construct(private CreateTeam $createTeam)
     {
         //
     }
+    /* @end-chisel-teams */
 
     /**
      * Validate and create a newly registered user.

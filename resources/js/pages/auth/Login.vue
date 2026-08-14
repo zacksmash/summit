@@ -1,19 +1,29 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
+/* @chisel-passkeys */
 import PasskeyVerify from '@/components/PasskeyVerify.vue';
+/* @end-chisel-passkeys */
 import PasswordInput from '@/components/PasswordInput.vue';
+/* @chisel-teams */
 import TeamInvitationAlert from '@/components/TeamInvitationAlert.vue';
+/* @end-chisel-teams */
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+/* @chisel-registration */
 import { register } from '@/routes';
+/* @end-chisel-registration */
 import { store } from '@/routes/login';
+/* @chisel-password-reset */
 import { request } from '@/routes/password';
+/* @end-chisel-password-reset */
+/* @chisel-teams */
 import type { TeamInvitationContext } from '@/types';
+/* @end-chisel-teams */
 
 defineOptions({
     layout: {
@@ -24,8 +34,12 @@ defineOptions({
 
 defineProps<{
     status?: string;
+    /* @chisel-password-reset */
     canResetPassword: boolean;
+    /* @end-chisel-password-reset */
+    /* @chisel-teams */
     teamInvitation?: TeamInvitationContext | null;
+    /* @end-chisel-teams */
 }>();
 </script>
 
@@ -39,13 +53,17 @@ defineProps<{
         {{ status }}
     </div>
 
+    <!-- @chisel-teams -->
     <TeamInvitationAlert
         v-if="teamInvitation"
         :invitation="teamInvitation"
         action="Log in"
     />
+    <!-- @end-chisel-teams -->
 
+    <!-- @chisel-passkeys -->
     <PasskeyVerify />
+    <!-- @end-chisel-passkeys -->
 
     <Form
         v-bind="store.form()"
@@ -72,6 +90,7 @@ defineProps<{
             <div class="grid gap-2">
                 <div class="flex items-center justify-between">
                     <Label for="password">Password</Label>
+                    <!-- @chisel-password-reset -->
                     <TextLink
                         v-if="canResetPassword"
                         :href="request()"
@@ -80,6 +99,7 @@ defineProps<{
                     >
                         Forgot password?
                     </TextLink>
+                    <!-- @end-chisel-password-reset -->
                 </div>
                 <PasswordInput
                     id="password"
@@ -111,6 +131,7 @@ defineProps<{
             </Button>
         </div>
 
+        <!-- @chisel-registration -->
         <div class="text-center text-sm text-muted-foreground">
             Don't have an account?
             <TextLink
@@ -127,5 +148,6 @@ defineProps<{
                 Sign up
             </TextLink>
         </div>
+        <!-- @end-chisel-registration -->
     </Form>
 </template>

@@ -95,9 +95,11 @@ return [
             'endpoint' => env('DYNAMODB_ENDPOINT'),
         ],
 
+        /* @chisel-octane */
         'octane' => [
             'driver' => 'octane',
         ],
+        /* @end-chisel-octane */
 
         'failover' => [
             'driver' => 'failover',

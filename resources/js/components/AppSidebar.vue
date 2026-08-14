@@ -6,7 +6,9 @@ import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
+/* @chisel-teams */
 import TeamSwitcher from '@/components/TeamSwitcher.vue';
+/* @end-chisel-teams */
 import {
     Sidebar,
     SidebarContent,
@@ -19,7 +21,9 @@ import {
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
+/* @chisel-teams */
 const page = usePage();
+/* @end-chisel-teams */
 
 const dashboardUrl = computed(() =>
     page.props.currentTeam ? dashboard(page.props.currentTeam.slug).url : '/',
@@ -59,11 +63,13 @@ const footerNavItems: NavItem[] = [
                     </SidebarMenuButton>
                 </SidebarMenuItem>
             </SidebarMenu>
+            <!-- @chisel-teams -->
             <SidebarMenu>
                 <SidebarMenuItem>
                     <TeamSwitcher />
                 </SidebarMenuItem>
             </SidebarMenu>
+            <!-- @end-chisel-teams -->
         </SidebarHeader>
 
         <SidebarContent>
