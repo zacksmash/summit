@@ -12,15 +12,15 @@ Read the existing implementation first. Plan around what's already there — don
 
 ## Bug Fix
 
-Run the diagnosis loop in `references/bug-diagnosis.md`. The short version: build a feedback loop that goes red on *this* bug before touching any code — no red-capable command, no hypothesis. The loop's phases map onto the session's atomic steps, and the ranked hypotheses map onto the picker. Keep the scope tight — don't refactor while fixing. The grilling for a bug session is short: symptom, expected behavior, when it started, what changed.
+Run the diagnosis loop in `references/bug-diagnosis.md`. During planning, define the symptom and feedback-loop strategy without claiming a cause. After plan approval, make the red-capable feedback loop the first atomic task before changing production code. The loop's phases map onto the session's atomic steps, and its diagnostic paths map onto the picker. Keep the scope tight — don't refactor while fixing. The grilling for a bug session is short: symptom, expected behavior, when it started, and what changed.
 
 ## Refactor
 
-Explain the "why" in the plan — what's wrong with the current approach and what the target state looks like. Start with the riskiest or most impactful change. Suggest adding tests before refactoring if they don't already exist. Each step must leave the code in a working state — never break things mid-refactor.
+Explain the "why" in the plan — what's wrong with the current approach and what the target state looks like. Establish characterization tests or another observable baseline first when coverage is weak. Then change the smallest seam that reduces the highest risk. Each step must leave the code in a working state — never break things mid-refactor.
 
 ## Dependency Upgrade
 
-Check changelogs and breaking changes first. Include findings in the plan. Start with the upgrade itself (bump the version), then step through each breaking change one at a time. Suggest running the test suite after each step to catch regressions early.
+Check official changelogs, migration guides, compatibility constraints, and the existing baseline checks first. Include findings in the plan. Make the version and lockfile update together with the minimum compatibility edits needed to restore the narrow relevant check; do not leave an intentionally broken intermediate state. Then handle remaining breaking changes one at a time and expand validation toward the full suite.
 
 ## Performance Optimization
 

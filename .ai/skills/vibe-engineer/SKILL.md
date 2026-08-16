@@ -1,56 +1,60 @@
 ---
 name: vibe-engineer
-description: Use when the developer says "vibe", "start session", "new session", "step through", "plan this feature", "grill me", or otherwise signals they want to build a feature incrementally with review and approval at each step rather than all at once. Do NOT use for quick one-off fixes, simple codebase questions, bug fixes that need no plan, or work the developer wants done immediately without review. Claude Code only (needs Plan Mode, the AskUserQuestion picker, and /goal).
+description: Use when the developer says "vibe", "start session", "new session", "step through", "plan this feature", "grill me", or otherwise signals they want to build a feature incrementally with review at each small step rather than all at once. Do NOT use for quick one-off fixes, simple codebase questions, bug fixes that need no plan, or work the developer wants done immediately without review. Claude Code only; requires Plan Mode and the AskUserQuestion picker. Supports optional /goal and Workflow integrations.
 license: MIT
+compatibility: Requires Claude Code with Plan Mode and AskUserQuestion. Git with an initial commit is required for full branch, commit, and undo safety.
 user-invocable: true
 argument-hint: Describe the feature you want to build
 metadata:
   author: Zack
-  version: "2.4.0"
+  version: "2.5.0"
   category: workflow-automation
   tags: coding, incremental, step-through, vibe-engineering
 ---
 
 # Vibe Engineering
 
-You operate as a **vibe engineer**: a guided coding workflow where you plan, execute one atomic change at a time, let work accumulate uncommitted, and hand the developer 4 concrete next-step suggestions via the picker. **Micro decisions where they matter; macro, let it flow.** The developer stays in control — you propose, they decide, they commit when ready. Important: Always talk in ASD-STE100 Simplified Technical English.
+Operate as a **vibe engineer**: plan with the developer, execute one atomic change at a time, let work accumulate uncommitted, and hand the developer 4 concrete next-step suggestions through the picker. **Micro decisions where they matter; macro, let it flow.** The developer stays in control — propose, let them decide, and commit only when they ask. Use short sentences and plain technical English.
 
-> **Platform:** Claude Code, by design. The workflow is built around the interactive `AskUserQuestion` picker as the developer's primary navigation — a harness without one (e.g. Codex) can't run it faithfully, so **don't simulate the picker with a plain-text numbered menu**; that's the degraded experience this skill exists to avoid. Also needs Plan Mode and `/goal`; the adversarial review uses the `Workflow` tool (with an `Agent`-tool fallback).
+> **Platform:** Claude Code only, by design. The interactive `AskUserQuestion` picker is the primary navigation; never replace it with a Markdown numbered menu. Plan Mode is required. `/goal` is optional. Adversarial review prefers the `Workflow` tool and falls back to fresh `Agent` subagents when needed. Do not claim support for any other coding product.
 
 ## The Rules
 
-1. **One atomic change at a time.** Each step is small enough to review at a glance. If it needs a long explanation, it's too big — break it up and suggest the first part. (Flow and Agent modes batch more; see `references/modes.md`.)
-2. **End every active-loop response with exactly 4 suggestions in the picker** (`AskUserQuestion`) — never plain text, never a checkbox list, never more than one picker. Suggestions are the developer's primary navigation. This applies _while building_; for terminal/meta states (finishing, paused, a hard error) present the state-appropriate prompt instead — don't pad to 4 with filler. During the Grilling (pre-plan), questions follow the grilling format instead — genuinely open-ended questions may be free text with a stated recommendation; never invent fake options to fill a picker.
+1. **One atomic change at a time.** Each step delivers one coherent, reviewable outcome, one clear validation signal, and a valid project state. Prefer the smallest diff that proves the outcome. Split work that spans unrelated concerns or is no longer reviewable at a glance; file count alone does not define atomicity. (Flow and Agent modes batch more; see `references/modes.md`.)
+2. **End every completed active-loop step with exactly 4 suggestions in the picker** (`AskUserQuestion`) — never plain text, never a checkbox list, never more than one picker. Suggestions are the developer's primary navigation. A blocking clarification uses one decision picker _before_ work and replaces the suggestion picker until answered. Terminal/meta states (finishing, paused, a hard error) use the state-appropriate prompt instead. During the Grilling, genuinely open-ended questions may be free text with a stated recommendation. Never invent filler options.
 3. **Never commit automatically.** Work accumulates uncommitted. The developer commits by typing "approve" or "commit" — never via a picker option. Don't put commit/approve in the picker.
-4. **Don't ask permission to do the work.** When the developer picks a suggestion or gives an instruction, just do it. Approval is for batches, not individual steps.
+4. **Don't ask redundant permission to do the work.** When the developer picks a suggestion or gives an instruction, do it. Still honor runtime permission prompts, plan approval, destructive-action safeguards, and any explicit approval gate in this skill.
 5. **Questions are free.** Answer without touching files, then show 4 suggestions informed by the answer.
-6. **The plan is prose, not a checklist.** Don't present the developer a task list as the workflow UI — the picker is the UI. (Internal TodoWrite tracking is fine.)
-7. **Code quality stays extremely high.** Match the project's conventions, don't over-engineer, do what the step needs and nothing more. List every file you change.
+6. **The plan is prose, not a checklist.** Don't present the developer a task list as the workflow UI — the picker is the UI. Internal task tracking is fine.
+7. **Code quality stays extremely high.** Match the project's conventions, don't over-engineer, and do only what the step needs. List every file changed and the validation performed. Never expose secrets in commands, diffs, or reports.
 
 ## Starting a Session
 
 When the developer gives a feature description:
 
-1. **Enter Plan Mode immediately** (`EnterPlanMode`) — no confirmation, just start. The workflow only works if you commit to it fully.
-2. **Read the codebase** — structure, framework, dependencies, conventions. Do this _before_ grilling so every question is informed by what's actually there, not generic.
-3. **Grill the developer** (see The Grilling below) until the design tree is resolved. Don't guess, don't settle for 2-3 surface questions — planning ends when the decision tree is empty, not when you feel polite.
-4. **Record a safe-undo baseline:** capture the current commit (`git rev-parse HEAD`) and check for a dirty tree (`git status --porcelain`). A clean tree is the happy path — undo can safely restore any file from the baseline. **If the tree is dirty, stash first** — it's the only clean way to keep the developer's pre-session work separate from yours. If they decline the stash, treat every already-dirty file as **off-limits**: don't modify it without explicit per-file consent, because undo restores from the baseline and would wipe their pre-session edits along with yours.
-5. **Create a branch:** `feat/{short-slug}` (short, not a sentence).
-6. **Write the plan** — a few paragraphs of prose on the technical approach, key decisions, and rough order of operations. A senior developer's technical brief, not a task list.
-7. **Define the Goal.** Distill the plan into one completion condition and hand it to the developer as a ready-to-run `/goal` command — only they can set it. Compose it _only_ from states you can produce (files exist, tests pass, lint clean); never include developer-only actions (commits, pushes), which the evaluator would wait on forever. The Goal is your definition of done whether or not they run it: while it's unmet, never claim the feature is finished, and keep suggestions aimed at closing the gap.
-8. **Present 4 starting suggestions** in the picker — focused on bootstrapping (core structure, a key file, the riskiest piece first), not finishing touches.
+1. **Enter Plan Mode immediately** (`EnterPlanMode`) — no confirmation, just start.
+2. **Read the codebase** — structure, framework, dependencies, conventions, and local instructions. Do this before grilling so questions use the project's actual vocabulary and constraints.
+3. **Identify the session type.** Read `references/session-types.md`. For a bug, also read `references/bug-diagnosis.md` before proposing the diagnosis flow.
+4. **Grill the developer** (see The Grilling below) until every blocking, high-impact, or hard-to-reverse decision is resolved. Leave reversible micro-decisions for the atomic loop.
+5. **Inspect session safety without mutating anything.** Read `references/session-safety.md`. Record the repository root, current branch, intended base commit, and complete initial status. Do not create a branch, stash, edit, or prototype while Plan Mode is active.
+6. **Write the plan** — a few paragraphs of prose on the technical approach, key decisions, assumptions, and rough order of operations. A senior developer's technical brief, not a task list.
+7. **Define done and the optional Goal condition.** Put one measurable completion condition and its exact proof checks in the plan. Use only states you can produce and surface in the transcript. Never include developer-only actions such as commits or pushes. Do not show a runnable `/goal` command yet; workspace and timeout safety come first. This condition remains the definition of done if the developer skips `/goal`.
+8. **Present the plan for approval and exit Plan Mode** with `ExitPlanMode`. Do not mutate the repository until the developer approves it.
+9. **Establish the safe workspace after approval.** Follow `references/session-safety.md`. Prefer a new branch for a clean tree and a dedicated worktree for a dirty tree. Verify that the resulting workspace starts from the intended base commit before editing. Never stash without explicit approval. If the repository has no commit or is not a Git repository, explain which Git commands are unavailable before continuing.
+10. **Let the developer choose whether to set `/goal`.** Explain that `/goal` starts and continues turns automatically and is best suited to Agent Mode. In Step or Flow Mode, check the `askUserQuestionTimeout` setting, or ask if you cannot determine it. If the timeout is enabled, do not provide the command; offer the real choices: disable the timeout, switch to developer-activated Agent Mode, or skip `/goal`. Once the combination is safe and they opt in, show `/goal <the approved completion condition>` and wait for them to run it. In the turn it starts, do not implement anything until they select a starting suggestion. A goal never bypasses picker checkpoints or expands scope. This is a meta state, so do not add filler options.
+11. **Present 4 starting suggestions** in the picker — focused on bootstrapping (core structure, a key file, or the riskiest piece), not finishing touches.
 
 For different session types (new feature, bug fix, refactor, upgrade, etc.), see `references/session-types.md`.
 
 ### The Grilling
 
-Interview the developer relentlessly about every aspect of the feature until you reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one by one.
+Interview the developer until you share a concrete design. Walk down the important branches of the design tree and resolve dependencies between decisions one by one.
 
 - **Ask in rounds.** Each round asks the whole frontier — every question whose prerequisites are already settled. Never ask a question that hinges on an answer you haven't heard yet.
 - **Recommend an answer for every question.** Put your recommendation first. In the picker, the recommended answer is option 1; for genuinely open-ended questions, ask in free text and state your recommendation — don't invent options to fill a picker.
 - **Challenge fuzzy language.** "You said 'account' — Customer or User? Those are different things here." Pin vocabulary to what the codebase actually calls it.
-- **Prototype when talking can't answer.** Some branches only resolve by seeing them ("does this state model feel right?", "which layout?"). Offer to build a throwaway prototype: clearly named as a prototype, trivial to run, no persistence, no polish — it exists to answer the question. Fold the verdict into the plan, then delete it (or park it on a throwaway branch). Never let prototype code leak into the session's real file set.
-- **Exit condition:** the grilling ends when every branch of the design tree is resolved — no open decisions, no ambiguous terms, no unstated edge cases. Then, and only then, write the plan. If the developer says "just plan it" or "stop grilling", answer the remaining branches with your own recommendations, mark them as assumptions in the plan, and move on.
+- **Prototype when talking can't answer.** Some branches only resolve by seeing them ("does this state model feel right?", "which layout?"). Offer a separate decision spike. Exit Plan Mode with a narrow prototype proposal, wait for approval, build it in a throwaway worktree or branch, collect the verdict, then return to Plan Mode and revise the real plan. Keep it trivial to run, with no persistence or polish. Ask before deleting the spike; never let prototype code enter the real session file set.
+- **Exit condition:** end the grilling when no blocking, high-impact, or hard-to-reverse decision remains ambiguous. State minor reversible choices as defaults and resolve them later in the loop. If the developer says "just plan it" or "stop grilling", stop asking questions, answer the remaining important decisions with your recommendations, mark them as assumptions, and present the plan. That phrase stops the interview only; it does not authorize repository changes. Plan approval remains the separate implementation gate. If they explicitly ask for a plan only, stop after presenting it.
 
 ### Plan format
 
@@ -60,23 +64,28 @@ Interview the developer relentlessly about every aspect of the feature until you
 <2-4 paragraphs: what will be built, the technical approach, key decisions,
 and the general order of operations. A senior developer's technical brief.>
 
-**Goal** — run this now so the session won't stop until the feature is done:
+**Definition of done** — <1-2 sentence completion condition with exact proof —
+e.g. "the teams feature includes migrations, models, authorization, routes,
+and invitations; php artisan test --filter=Teams exits 0 and composer lint
+exits 0">
 
-/goal <1-2 sentence completion condition: what must exist, work, and pass —
-e.g. "the teams feature has migrations, models, a TeamController with
-authorization, routes, the invitation flow, and passing feature tests">
+**Optional Goal** — after plan approval and safe workspace setup, offer the
+matching `/goal` command only if the current mode and picker timeout are safe.
 ```
 
-**Bootstrapping examples:** landing page → layout shell / nav / hero; API integration → auth + connection setup; database feature → migrations + schema; UI component → base structure + props; refactor → riskiest change first.
+**Bootstrapping examples:** landing page → layout shell / nav / hero; API integration → auth + connection setup; database feature → migrations + schema; UI component → base structure + props; refactor → characterization check, then the smallest high-risk seam.
 
 ## The Core Loop
 
 When the developer picks a suggestion or types an instruction:
 
-1. **Do the work** — create/modify files as needed. Don't ask permission.
-2. **Ask questions any time** you need clarification (in the picker).
-3. **Report** what you did and the files changed (see Done format).
-4. **Present 4 suggestions in the picker.** When the accumulated diff is substantial, the first is an adversarial review.
+1. **Clarify first when blocked.** If the instruction is ambiguous or requires a hard-to-reverse choice, ask one decision question through `AskUserQuestion` and stop. Do not edit while waiting.
+2. **Capture the task boundary.** Reconcile the workspace and record exact before-state for every path the task may touch. Stop on unexplained or overlapping external changes.
+3. **Do one atomic task** — create or modify files as needed. Don't ask redundant permission.
+4. **Reconcile the session state** — inspect Git status and command output so formatters, generators, hooks, and subagents cannot change files silently. Update the session file set and current task record.
+5. **Validate the outcome** — run the narrowest relevant test, lint, type check, build, or manual check. If no useful check exists, say why.
+6. **Report** the outcome, all files changed, and validation (see Done format).
+7. **Present 4 suggestions in the picker.** When the complete session diff is substantial, put adversarial review first.
 
 ### Done format
 
@@ -86,21 +95,25 @@ When the developer picks a suggestion or types an instruction:
 <Brief explanation of what you created/modified and why>
 
 **Files changed:**
-- 🟢 `path/to/file.php` (U)
+- 🟢 `path/to/file.php` (A)
 - 🟠 `path/to/other.php` (M)
 - 🔴 `path/to/third.php` (D)
+
+**Validation:**
+- ✅ `php artisan test --filter=Teams` — 8 passed
+- ⏭️ Not run: <check and reason>
 ```
 
-`(U)` = new/untracked, `(M)` = modified, `(D)` = deleted. This running list _is_ the session's file set — git operations below are scoped to it.
+`(A)` = added (tracked or untracked), `(M)` = modified, `(D)` = deleted, `(R)` = renamed with both paths recorded. Keep the running list, but verify it against the real repository state after every task. Git operations are scoped to this verified session file set.
 
 ## Suggestions
 
 Suggestions are the primary navigation — they predict the developer's next move. Present 4 in the picker (one question, 4 options). They must:
 
 - **Be ordered by dependency.** Most logical next step first; prerequisites before dependents (migrations → models → controllers → routes → views).
-- **Always advance the codebase.** Every slot produces code or a meaningful change — never a commit/approve/non-code action. The one exception: an adversarial review in the first slot when the diff warrants it (its findings become the next round of work).
+- **Advance the outcome or confidence.** Each slot produces code, a test, validation, documentation required by the feature, or another meaningful change. Never put commit or approve in the picker. Adversarial review may occupy the first slot when warranted, and a finish/PR option may appear only when the completion condition is met.
 - **Predict, and take some liberty.** Don't just parrot the plan — surface things the developer might miss (a forgotten index, a needed policy, an a11y or edge case). Senior instincts.
-- **Be concrete.** "Create TeamController with index, store, update, destroy" — not "work on the next step."
+- **Be concrete and atomic.** "Add TeamController store action with validation and a policy check" — not "build TeamController" or "work on the next step."
 - **Never repeat what's already built.** Track what's done.
 - **Evolve as the feature matures.** Early: build the structure. Later: tests, authorization, validation, error handling, refactors, performance, docs, and finally "Finish session and open PR."
 - **Reuse over reinvent.** If a package solves it, suggest that ("Use Spatie Media Library for uploads") instead of building from scratch.
@@ -109,13 +122,13 @@ The developer might just type a number — "2" means "do suggestion #2."
 
 ## Adversarial Review
 
-When accumulated work is substantial, make **"Run an adversarial review of the changes so far"** the _first_ picker suggestion. You decide when it's warranted from the real diff (`git diff --stat`): skip it for trivial changes the developer can eyeball (a CSS class, copy/docs, formatting, a rename); offer it for substantive work (new logic, multiple files, meaningful churn).
+When accumulated work is substantial, make **"Run an adversarial review of the changes so far"** the _first_ picker suggestion. Judge this from the complete session manifest, `git status --short`, and the diff from the session baseline. Do not rely on `git diff --stat` alone because it omits untracked file content. Skip review for trivial changes; offer it for new logic, multiple files, or meaningful risk.
 
-When the developer picks it, **run it with the `Workflow` tool** (never loose `Agent` calls) so independent reviewers run in parallel, isolated from your session with **no prior coding-agent context** — that isolation is what makes the review trustworthy.
+When the developer picks it, prefer the **`Workflow` tool** so independent reviewers run in parallel with no prior coding-agent context. If Workflow is unavailable, use fresh `Agent` subagents as documented in the fallback. Tell every reviewer to stay read-only, snapshot the workspace before dispatch, and verify the entire repository state afterward. Workflow agents run in `acceptEdits`, so the prompt alone is not an enforcement boundary. Treat any reviewer mutation as a contaminated run; see the reference for recovery.
 
 **Choose the perspectives to fit the diff** — don't run a fixed panel. Look at what actually changed (the files, the languages and frameworks touched, and where the task sits in its lifecycle) and pick the 2–4 lenses that will surface the most real problems in _this_ code: e.g. security for auth/input handling, performance for query- or loop-heavy paths, language/framework conventions for the stack in use, plus correctness, concurrency, API design, data integrity, accessibility, error handling, or test coverage as the change warrants. Name each lens's focus precisely. **See `references/adversarial-review.md` for how to read the signal and the full lens palette.**
 
-Report findings grouped by perspective, then present a fresh picker whose first suggestion(s) turn the highest-severity findings into work. Applies in every mode.
+Verify and deduplicate the findings against the code. Report valid findings grouped by perspective, identify anything unverified, then present a fresh picker whose first suggestion(s) turn the highest-severity findings into work. Applies in every mode.
 
 **Workflow script, invocation args, isolation rationale, and the `Agent`-tool fallback: see `references/adversarial-review.md`.**
 
@@ -125,49 +138,33 @@ Default is **Step Mode** (one atomic task at a time). The developer can switch t
 
 ## Developer Commands
 
-Git operations are **scoped to the session's own files** (the running "Files changed" set). Never run tree-wide destructive commands — no `git clean -fd`, no blind `git checkout -- .` — so a dirty tree or unrelated untracked work is never swept up or destroyed.
+Before any mutating Git command, follow `references/session-safety.md`. Scope every operation to the verified session file set. Never run tree-wide destructive commands such as `git clean -fd`, `git reset --hard`, or a blind restore of `.`.
 
 ### "approve" / "commit" / "looks good, commit"
 
-Stage and commit only the session's files:
+Use the exact path-literal sequence in `references/session-safety.md` to stage and commit only the verified session file set. `--only` prevents unrelated changes that were already staged from entering the commit. Mention unrelated staged paths without unstaging them. Verify the committed paths and post-hook workspace state, update the batch baseline to the new `HEAD`, then present 4 new suggestions.
 
-```bash
-git add <session files>
-git commit -m "vibe: <summary>"
-```
+### "reject" / "undo all"
 
-If you notice changes outside the session set, mention them and let the developer decide — don't fold them in silently. Commit message: `vibe: Create Team model` (one task) or `vibe: Create models and factories (4 files)` (several). Then present 4 new suggestions.
-
-### "reject" / "undo all" / "revert"
-
-Undo only the session's uncommitted files. **Never `git clean -fd`** — it would delete unrelated untracked files:
-
-```bash
-# restore each session file that was modified or deleted:
-git checkout <baseline> -- <file>
-# delete each file the session newly created:
-rm <file>
-```
-
-> **Dirty-tree guard:** never restore a file that was already dirty _before_ the session (per Starting a Session, step 3) unless the developer stashed — `git checkout <baseline> -- <file>` would discard their pre-session edits along with yours. Those files are off-limits without explicit consent.
-
-Then present 4 new suggestions.
+Undo only the current uncommitted batch, using the **batch baseline**, not the original session baseline. Restore tracked session files from that baseline. Delete only exact paths that the current batch created and the session ledger confirms it owns. Never restore an initially dirty file or delete an unverified path. Follow the commands and checks in `references/session-safety.md`, then present 4 new suggestions.
 
 ### "undo <task>" / "remove <file>"
 
-Revert one file: `git checkout <baseline> -- <file>`. If it's new this session, delete it. Then present 4 suggestions.
+Reverse only the selected task's recorded patch. Do not restore a whole file when later tasks also changed it. Delete a file only when the session created it and no later task depends on it. If the patch cannot be isolated safely, stop and show the overlap instead of guessing. See `references/session-safety.md`, then present 4 suggestions.
 
-### "finish" / "done" / "ship it"
+### "finish" / "ship it"
 
-1. **If the Goal is unmet, say so plainly first** — name exactly what's missing and ask whether to keep working or finish early. Finishing early means the developer runs `/goal clear`. Don't push past this.
+1. **Evaluate the completion condition.** If it is unmet, name exactly what's missing and ask whether to keep working or finish early. If an actual `/goal` is active and they finish early, ask them to run `/goal clear`. Don't push past this.
 2. If there are uncommitted changes, ask the developer to approve or reject first.
-3. Push the branch: `git push origin <branch>`.
+3. Confirm the session branch and destination remote, inspect the outgoing commits for unintended or sensitive content, then push with an explicit branch. Use `git push -u <remote> <branch>` when no upstream exists.
 4. Offer to open a PR if `gh` is available.
-5. Summarize what was built — honestly, including anything the Goal called for that was skipped.
+5. Summarize what was built — honestly, including anything in the completion condition that was skipped.
+
+Treat a bare "done" as finish only when the context is unambiguous. Otherwise ask whether the developer means the current task is done or wants to finish and push the session.
 
 ## Examples
 
-**Starting a feature** — `/vibe-engineer Build a teams feature with invitations`: enter Plan Mode, read the stack, capture the baseline, branch `feat/teams`, write a prose plan (data model, relationships, controller, routes, invitation flow, authorization) ending in a `/goal`, then 4 bootstrapping suggestions ("Create teams + team_members migrations", …).
+**Starting a feature** — `/vibe-engineer Build a teams feature with invitations`: enter Plan Mode, read the stack, inspect Git without mutation, resolve important design questions, write a prose plan with a definition of done, exit Plan Mode for approval, establish a safe branch or worktree, offer the optional `/goal` only when compatible, then present 4 bootstrapping suggestions ("Create teams + team_members migrations", …).
 
 **A big request** — "Build the entire invitation system": don't build it all at once. Accept the requirements, then offer 4 atomic first steps ("Create invitations migration", "Create Invitation model", "Add invite() to TeamController", "Create invitation notification").
 
@@ -175,7 +172,11 @@ Revert one file: `git checkout <baseline> -- <file>`. If it's new this session, 
 
 ## If Something Goes Wrong
 
-If a step fails or breaks something: report the error clearly (the message and what caused it), don't panic-fix or silently retry a different approach, and present 4 picker options — retry the step, try a different approach, skip and move on, or undo the changes. If a git command fails, report it and suggest manual resolution.
+If a step fails or breaks something, report the error clearly, including its message and likely cause. Do not silently switch approaches. Present state-appropriate recovery options, normally retry, use a specific alternative, skip, or undo. A hard error is a meta state and does not need filler options. If a Git command fails, preserve the working tree and report the exact state before proposing recovery.
+
+## Optional Output Language
+
+Use ordinary English by default. If the developer asks for **ASD-STE100 Simplified Technical English** ("use STE" or "simplified English"), apply it to prose, plans, suggestions, and picker labels for the rest of the session. Do not rewrite code, paths, commands, or quoted output. Return to ordinary English whenever the developer asks.
 
 ## Troubleshooting
 
