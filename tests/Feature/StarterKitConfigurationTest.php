@@ -23,6 +23,12 @@ test('defines the Laravel community starter kit contract', function () {
         ->toContain("'tests/Feature/StarterKitConfigurationTest.php'");
 });
 
+test('keeps the sidebar content sticky within the viewport', function () {
+    expect(file_get_contents(dirname(__DIR__, 2).'/resources/js/layouts/app/AppSidebarLayout.vue'))
+        ->toContain('class="min-w-0 overflow-x-clip"')
+        ->not->toContain('class="overflow-x-hidden"');
+});
+
 test('offers all bundled features as default Chisel selections', function () {
     /** @var Script $script */
     $script = require dirname(__DIR__, 2).'/chisel.php';
