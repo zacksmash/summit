@@ -758,8 +758,7 @@ return Chisel::script(__DIR__)
                 chiselRun(['npx', 'playwright', 'install'], 'Install Playwright Browsers');
             }
 
-            $c->npm()->run('lint');
-            $c->npm()->run('format');
+            $c->npm()->run('check:fix');
         }
 
         if (file_exists(__DIR__.'/composer.lock')) {

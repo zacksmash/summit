@@ -77,7 +77,7 @@ These guidelines are working if: fewer unnecessary changes in diffs, fewer rewri
 Run the smallest verification set that matches the files you changed:
 
 - PHP changed: `composer lint && composer types:check` and the smallest relevant `php artisan test --compact ...` command.
-- JS, TS, or Vue changed: `npm run format` and `npm run lint`; add `npm run types:check` when types, route wiring, or page props changed.
+- JS, TS, or Vue changed: `npm run check:fix`; add `npm run types:check` when types, route wiring, or page props changed.
 - Wide refactors or cross-cutting changes: expand verification only as needed to cover the risk.
 - Docs or process-only changes: record `Verification: not run (docs-only or process-only change)`.
 

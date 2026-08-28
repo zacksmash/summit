@@ -73,7 +73,7 @@
             "npx playwright install",
             "herd secure --no-interaction",
             "herd proxy \"$(basename \"$PWD\")\" http://127.0.0.1:8000 --secure --no-interaction",
-            "npm run format",
+            "npm run check:fix",
             "git rev-parse -q --verify HEAD >/dev/null 2>&1 || (git add --all && git commit --no-verify -m \"Initial commit\")"
         ],
         "dev": [
@@ -82,7 +82,7 @@
         ],
         "serve": [
             "Composer\\Config::disableProcessTimeout",
-            "npx @laravel/multiplex 'server@yellow,php artisan octane:start --watch' 'queue@blue,php artisan queue:listen --tries=1 --timeout=0' 'logs@magenta,php artisan pail --timeout=0' 'vite@green,vite build'"
+            "npx @laravel/multiplex 'server@yellow,php artisan octane:start --watch' 'queue@blue,php artisan queue:listen --tries=1 --timeout=0' 'logs@magenta,php artisan pail --timeout=0' 'vite@green,vp build'"
         ],
         "lint": [
             "pint --parallel",
@@ -94,8 +94,7 @@
         ],
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
-            "npm run lint:check",
-            "npm run format:check",
+            "npm run check",
             "npm run types:check",
             "@test"
         ],

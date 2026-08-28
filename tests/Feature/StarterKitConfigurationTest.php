@@ -52,6 +52,49 @@ test('tracks current Laravel skeleton housekeeping', function () {
         ->toContain('lsp-*.php');
 });
 
+test('uses Vite Plus for frontend development and code quality', function () {
+    $root = dirname(__DIR__, 2);
+    $package = json_decode(file_get_contents($root.'/package.json'), true, 512, JSON_THROW_ON_ERROR);
+    $composer = json_decode(file_get_contents($root.'/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+    $viteConfig = file_get_contents($root.'/vite.config.ts');
+    $chisel = file_get_contents($root.'/chisel.php');
+
+    expect($package['scripts'])->toBe([
+        'build' => 'vp build',
+        'build:ssr' => 'vp build && vp build --ssr',
+        'dev' => 'vp dev',
+        'check' => 'vp check',
+        'check:fix' => 'vp check --fix',
+        'types:check' => 'vue-tsc --noEmit',
+    ])->and($package['devDependencies'])
+        ->toHaveKey('vite-plus', '0.3.0')
+        ->not->toHaveKey('oxfmt')
+        ->not->toHaveKey('oxlint')
+        ->not->toHaveKey('oxlint-tsgolint')
+        ->and($composer['scripts']['ci:check'])->toBe([
+            'Composer\\Config::disableProcessTimeout',
+            'npm run check',
+            'npm run types:check',
+            '@test',
+        ])->and(implode("\n", $composer['scripts']['serve']))
+        ->toContain("'vite@green,vp build'")
+        ->and($viteConfig)
+        ->toContain("import { defineConfig, lazyPlugins } from 'vite-plus';")
+        ->toContain('plugins: lazyPlugins(() => [')
+        ->toContain('denyWarnings: true')
+        ->toContain('typeAware: true')
+        ->toContain("entryPoint: 'resources/css/app.css'")
+        ->toContain("'resources/js/components/ai-elements/*'")
+        ->and($chisel)
+        ->toContain("\$c->npm()->run('check:fix');")
+        ->not->toContain("\$c->npm()->run('lint');")
+        ->not->toContain("\$c->npm()->run('format');")
+        ->and(file_get_contents($root.'/resources/js/app.ts'))
+        ->toContain('void createInertiaApp({')
+        ->and(file_exists($root.'/.oxfmtrc.json'))->toBeFalse()
+        ->and(file_exists($root.'/.oxlintrc.json'))->toBeFalse();
+});
+
 test('offers all bundled features as default Chisel selections', function () {
     /** @var Script $script */
     $script = require dirname(__DIR__, 2).'/chisel.php';
@@ -103,7 +146,7 @@ test('keeps the portable and machine-specific setup workflows separate', functio
         ->toContain('playwright install')
         ->toContain('whisky install')
         ->toContain('ide-helper:generate')
-        ->toContain('npm run format')
+        ->toContain('npm run check:fix')
         ->toEndWith('git rev-parse -q --verify HEAD >/dev/null 2>&1 || (git add --all && git commit --no-verify -m "Initial commit")');
 });
 

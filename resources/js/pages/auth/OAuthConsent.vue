@@ -66,13 +66,13 @@ function onDenySubmit(): void {
     <Head title="Authorize Application" />
 
     <div
-        class="min-h-screen bg-background font-sans text-foreground antialiased"
+        class="bg-background text-foreground min-h-screen font-sans antialiased"
     >
         <div class="flex min-h-screen items-center justify-center p-4">
             <Card class="w-full max-w-md">
                 <CardHeader class="text-center">
                     <div class="mb-4 flex items-center justify-center">
-                        <ShieldCheck class="h-12 w-12 text-primary" />
+                        <ShieldCheck class="text-primary h-12 w-12" />
                     </div>
 
                     <CardTitle class="text-2xl tracking-tight">
@@ -86,8 +86,8 @@ function onDenySubmit(): void {
 
                 <CardContent class="space-y-4">
                     <!-- User Info -->
-                    <div class="rounded-lg border bg-muted/50 p-4">
-                        <p class="mb-2 text-sm text-muted-foreground">
+                    <div class="bg-muted/50 rounded-lg border p-4">
+                        <p class="text-muted-foreground mb-2 text-sm">
                             Logged in as:
                         </p>
                         <p class="font-medium">{{ user.email }}</p>
@@ -104,13 +104,13 @@ function onDenySubmit(): void {
                                 class="flex items-start gap-2"
                             >
                                 <div
-                                    class="mt-0.5 rounded-full bg-primary/10 p-1"
+                                    class="bg-primary/10 mt-0.5 rounded-full p-1"
                                 >
                                     <div
-                                        class="h-1.5 w-1.5 rounded-full bg-primary"
+                                        class="bg-primary h-1.5 w-1.5 rounded-full"
                                     ></div>
                                 </div>
-                                <span class="text-sm text-muted-foreground">
+                                <span class="text-muted-foreground text-sm">
                                     {{ scope.description }}
                                 </span>
                             </li>
