@@ -31,4 +31,17 @@ export default defineConfig({
             formVariants: true,
         }),
     ],
+    server: {
+        watch: {
+            ignored: [
+                '**/.agents/**',
+                '**/.ai/**',
+                '**/.claude/**',
+                '**/.codex/**',
+                '**/.cursor/**',
+                '**/.junie/**',
+                '**/vendor/**',
+            ],
+        },
+    },
 });

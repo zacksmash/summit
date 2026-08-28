@@ -29,6 +29,20 @@ test('keeps the sidebar content sticky within the viewport', function () {
         ->not->toContain('class="overflow-x-hidden"');
 });
 
+test('ignores generated and tool-owned paths in the Vite watcher', function () {
+    $viteConfig = file_get_contents(dirname(__DIR__, 2).'/vite.config.ts');
+
+    expect($viteConfig)
+        ->toContain('server: {')
+        ->toContain("'**/.agents/**'")
+        ->toContain("'**/.ai/**'")
+        ->toContain("'**/.claude/**'")
+        ->toContain("'**/.codex/**'")
+        ->toContain("'**/.cursor/**'")
+        ->toContain("'**/.junie/**'")
+        ->toContain("'**/vendor/**'");
+});
+
 test('offers all bundled features as default Chisel selections', function () {
     /** @var Script $script */
     $script = require dirname(__DIR__, 2).'/chisel.php';
