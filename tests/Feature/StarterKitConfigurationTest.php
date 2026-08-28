@@ -43,6 +43,15 @@ test('ignores generated and tool-owned paths in the Vite watcher', function () {
         ->toContain("'**/vendor/**'");
 });
 
+test('tracks current Laravel skeleton housekeeping', function () {
+    $root = dirname(__DIR__, 2);
+
+    expect(file_get_contents($root.'/config/logging.php'))
+        ->toContain('Available drivers: "single", "daily", "monthly", "slack", "syslog",')
+        ->and(file_get_contents($root.'/storage/framework/.gitignore'))
+        ->toContain('lsp-*.php');
+});
+
 test('offers all bundled features as default Chisel selections', function () {
     /** @var Script $script */
     $script = require dirname(__DIR__, 2).'/chisel.php';
