@@ -95,6 +95,24 @@ test('uses Vite Plus for frontend development and code quality', function () {
         ->and(file_exists($root.'/.oxlintrc.json'))->toBeFalse();
 });
 
+test('runs the consolidated Laravel CI workflow across supported PHP versions', function () {
+    $root = dirname(__DIR__, 2);
+    $workflow = file_get_contents($root.'/.github/workflows/tests.yml');
+
+    expect(file_exists($root.'/.github/workflows/lint.yml'))->toBeFalse()
+        ->and($workflow)
+        ->toContain('actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1')
+        ->toContain('shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2')
+        ->toContain('actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0')
+        ->toContain("php-version: ['8.4', '8.5']")
+        ->toContain('coverage: none')
+        ->toContain('run: composer setup')
+        ->toContain('run: npx playwright install --with-deps')
+        ->toContain('run: composer ci:check')
+        ->not->toContain('run: php artisan test')
+        ->not->toContain('contents: write');
+});
+
 test('offers all bundled features as default Chisel selections', function () {
     /** @var Script $script */
     $script = require dirname(__DIR__, 2).'/chisel.php';
