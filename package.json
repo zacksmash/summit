@@ -18,6 +18,7 @@
         "@vitejs/plugin-vue": "^6.0.8",
         "chokidar": "^5.0.0",
         "concurrently": "^10.0.4",
+        "fontaine": "^0.8.1",
         "playwright": "^1.62.1",
         "shadcn-vue": "^2.8.2",
         "typescript": "^6.0.3",

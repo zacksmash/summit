@@ -67,6 +67,7 @@ test('uses Vite Plus for frontend development and code quality', function () {
         'check:fix' => 'vp check --fix',
         'types:check' => 'vue-tsc --noEmit',
     ])->and($package['devDependencies'])
+        ->toHaveKey('fontaine', '^0.8.1')
         ->toHaveKey('vite-plus', '0.3.0')
         ->not->toHaveKey('oxfmt')
         ->not->toHaveKey('oxlint')
@@ -85,6 +86,7 @@ test('uses Vite Plus for frontend development and code quality', function () {
         ->toContain('typeAware: true')
         ->toContain("entryPoint: 'resources/css/app.css'")
         ->toContain("'resources/js/components/ai-elements/*'")
+        ->not->toContain('optimizedFallbacks: false')
         ->and($chisel)
         ->toContain("\$c->npm()->run('check:fix');")
         ->not->toContain("\$c->npm()->run('lint');")
