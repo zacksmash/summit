@@ -67,11 +67,13 @@ test('uses Vite Plus for frontend development and code quality', function () {
         'check:fix' => 'vp check --fix',
         'types:check' => 'vue-tsc --noEmit',
     ])->and($package['devDependencies'])
-        ->toHaveKey('fontaine', '^0.8.1')
-        ->toHaveKey('vite-plus', '0.3.0')
+        ->toHaveKey('fontaine', '^0.8.2')
+        ->toHaveKey('vite-plus', '1.3.0')
+        ->toHaveKey('vite', 'npm:@voidzero-dev/vite-plus-core@1.3.0')
         ->not->toHaveKey('oxfmt')
         ->not->toHaveKey('oxlint')
         ->not->toHaveKey('oxlint-tsgolint')
+        ->and($package['overrides'])->toBe(['vite' => 'npm:@voidzero-dev/vite-plus-core@1.3.0'])
         ->and($composer['scripts']['ci:check'])->toBe([
             'Composer\\Config::disableProcessTimeout',
             'npm run check',
