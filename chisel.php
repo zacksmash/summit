@@ -694,8 +694,14 @@ return Chisel::script(__DIR__)
 
         if (! chiselSelected($answers, 'application_features', 'mcp')) {
             // Boost declares its own laravel/mcp dependency, so the app-level
-            // requirement can go even when the AI tooling stays.
-            $composerPackages[] = 'laravel/mcp';
+            // requirement can go even when the AI tooling stays. `composer remove`
+            // exits non-zero when the package stays installed, so drop only the
+            // root requirement and let the lock refresh below sync the hash.
+            if (chiselSelected($answers, 'development_features', 'ai-tooling')) {
+                $c->file('composer.json')->removeLinesContaining('"laravel/mcp":');
+            } else {
+                $composerPackages[] = 'laravel/mcp';
+            }
         }
 
         if (! chiselSelected($answers, 'development_features', 'octane')) {

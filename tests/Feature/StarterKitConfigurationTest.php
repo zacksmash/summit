@@ -228,6 +228,11 @@ test('drops laravel/mcp whenever the MCP scaffolding is deselected', function ()
         ->toContain("if (! chiselSelected(\$answers, 'application_features', 'mcp')) {");
 });
 
+test('drops the laravel/mcp root requirement without composer remove when Boost keeps it installed', function () {
+    expect(file_get_contents(dirname(__DIR__, 2).'/chisel.php'))
+        ->toContain("\$c->file('composer.json')->removeLinesContaining('\"laravel/mcp\":');");
+});
+
 test('removes the Chisel toolkit from generated projects', function () {
     expect(file_get_contents(dirname(__DIR__, 2).'/chisel.php'))
         ->toContain("'laravel/chisel',");
