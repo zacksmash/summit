@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+# Repair the application environment if it went missing after wake.
+if [ ! -f .env ]; then
+  cp -- .env.example .env
+  php artisan key:generate --force >/dev/null
+fi
+[ -f database/database.sqlite ] || touch database/database.sqlite

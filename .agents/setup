@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+repo_root="$(pwd)"
+
+step() {
+  printf '\n=== [%s] %s ===\n' "$(date -u +%H:%M:%S)" "$1"
+}
+
+as_root() {
+  if [ "$(id -u)" -eq 0 ]; then
+    "$@"
+  else
+    sudo "$@"
+  fi
+}
+
+step "PHP 8.4 (sury.org) and Composer"
+if command -v php >/dev/null 2>&1 && php -r 'exit(version_compare(PHP_VERSION, "8.4", ">=") ? 0 : 1);'; then
+  echo "php $(php -r 'echo PHP_VERSION;') already present, skipping apt install"
+else
+  as_root apt-get update -qq
+  as_root apt-get install -y -qq --no-install-recommends \
+    apt-transport-https ca-certificates curl gnupg lsb-release
+  if ! command -v php >/dev/null 2>&1; then
+    curl -sSLo /tmp/sury.gpg https://packages.sury.org/php/apt.gpg
+    echo "deb [signed-by=/tmp/sury.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" \
+      | as_root tee /etc/apt/sources.list.d/sury-php.list >/dev/null
+    as_root apt-get update -qq
+  fi
+  as_root apt-get install -y -qq --no-install-recommends \
+    php8.4-cli php8.4-sqlite3 php8.4-xml php8.4-curl php8.4-mbstring \
+    php8.4-zip php8.4-intl php8.4-gd php8.4-bcmath php8.4-bz2 unzip
+  echo "installed php $(php -r 'echo PHP_VERSION;')"
+fi
+
+if ! command -v composer >/dev/null 2>&1; then
+  curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
+  php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer --quiet
+  echo "installed composer $(composer --version)"
+else
+  echo "composer already present"
+fi
+
+step "Composer dependencies"
+# --no-scripts skips the post-update-cmd scaffolding hooks (install:features and
+# boost:update), which apply starter-kit feature defaults and regenerate tracked
+# guidance files in a non-interactive session. package:discover is run instead,
+# and vendor:publish is a no-op here.
+composer install --no-interaction --prefer-dist --no-progress --no-scripts
+php artisan package:discover --ansi
+php artisan vendor:publish --tag=laravel-assets --ansi --force
+
+step "Application environment, keys, and database"
+if [ ! -f .env ]; then
+  cp -- .env.example .env
+  php artisan key:generate --force --ansi
+  echo "created .env"
+else
+  echo ".env already present"
+fi
+[ -f database/database.sqlite ] || touch database/database.sqlite
+if grep -q '^APP_KEY=$' .env || ! grep -q '^APP_KEY=' .env; then
+  php artisan key:generate --force --ansi
+fi
+php artisan passport:keys --no-interaction --force
+php artisan migrate --seed --force
+
+step "Frontend dependencies (pnpm)"
+pnpm install
+
+step "Playwright Chromium (browser tests)"
+pnpm exec playwright install --with-deps chromium
+
+step "Frontend build (generates Wayfinder routes)"
+pnpm run build
+
+step "Orb agent guidance"
+profile_marker="# Summit orb setup"
+if ! grep -Fqx "$profile_marker" "$HOME/.config/amp/AGENTS.md" 2>/dev/null; then
+  mkdir -p "$HOME/.config/amp"
+  cat >> "$HOME/.config/amp/AGENTS.md" <<EOF
+
+$profile_marker
+- PHP 8.4+ (sury.org), Composer, Node, and pnpm are preinstalled by .agents/setup.
+- The .env file, APP_KEY, Passport keys, and the seeded SQLite database were created by .agents/setup.
+- Run frontend commands with pnpm (pnpm-workspace.yaml), not npm.
+EOF
+fi
+
+step "Setup complete"
