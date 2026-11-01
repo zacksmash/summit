@@ -78,6 +78,8 @@ export default defineConfig({
             '.ai/skills/**',
             '.claude/**',
             '.github/**',
+            '.mcp.json',
+            '.vscode/**',
             'AGENTS.md',
             'CLAUDE.md',
             'boost.json',
