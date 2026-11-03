@@ -1,0 +1,58 @@
+diff --git a/resources/js/components/ui/sidebar/Sidebar.vue b/resources/js/components/ui/sidebar/Sidebar.vue
+index 185c8fe..93ed7c9 100644
+--- a/resources/js/components/ui/sidebar/Sidebar.vue
++++ b/resources/js/components/ui/sidebar/Sidebar.vue
+@@ -24,7 +24,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+   <div
+     v-if="collapsible === 'none'"
+     data-slot="sidebar"
+-    :class="cn('bg-sidebar text-sidebar-foreground flex w-(--sidebar-width) flex-col', props.class)"
++    :class="cn('bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col', props.class)"
+     v-bind="$attrs"
+   >
+     <slot />
+diff --git a/resources/js/components/ui/sidebar/SidebarTrigger.vue b/resources/js/components/ui/sidebar/SidebarTrigger.vue
+index 8d6dc1a..a4d218a 100644
+--- a/resources/js/components/ui/sidebar/SidebarTrigger.vue
++++ b/resources/js/components/ui/sidebar/SidebarTrigger.vue
+@@ -1,6 +1,6 @@
+ <script setup lang="ts">
+ import type { HTMLAttributes } from "vue"
+-import { PanelLeft } from "@lucide/vue"
++import { PanelLeftClose, PanelLeftOpen } from "@lucide/vue"
+ import { cn } from "cn"
+ import { Button } from '@/components/ui/button'
+ import { useSidebar } from "./utils"
+@@ -9,7 +9,7 @@ const props = defineProps<{
+   class?: HTMLAttributes["class"]
+ }>()
+ 
+-const { toggleSidebar } = useSidebar()
++const { isMobile, state, toggleSidebar } = useSidebar()
+ </script>
+ 
+ <template>
+@@ -21,7 +21,8 @@ const { toggleSidebar } = useSidebar()
+     :class="cn('h-7 w-7', props.class)"
+     @click="toggleSidebar"
+   >
+-    <PanelLeft />
+-    <span class="sr-only">Toggle Sidebar</span>
++    <PanelLeftOpen v-if="isMobile || state === 'collapsed'" />
++    <PanelLeftClose v-else />
++    <span class="sr-only">Toggle sidebar</span>
+   </Button>
+ </template>
+diff --git a/resources/js/components/ui/sonner/Sonner.vue b/resources/js/components/ui/sonner/Sonner.vue
+index 8af8dfb..f57fb00 100644
+--- a/resources/js/components/ui/sonner/Sonner.vue
++++ b/resources/js/components/ui/sonner/Sonner.vue
+@@ -4,6 +4,8 @@ import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon
+ import { cn } from "cn"
+ import { Toaster as Sonner } from "vue-sonner"
+ 
++import 'vue-sonner/style.css';
++
+ const props = defineProps<ToasterProps>()
+ </script>
+ 
