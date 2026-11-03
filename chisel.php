@@ -753,7 +753,7 @@ return Chisel::script(__DIR__)
         // rebuild the schema from the surviving ones. The clone flow has no
         // database yet at this point; its later migrate only sees survivors.
         if (file_exists(__DIR__.'/database/database.sqlite')) {
-            chiselRun(['php', 'artisan', 'migrate:fresh', '--force', '--no-interaction'], 'Rebuild Database Schema');
+            chiselRun([PHP_BINARY, 'artisan', 'migrate:fresh', '--force', '--no-interaction'], 'Rebuild Database Schema');
         }
 
         chiselRun(['composer', 'lint'], 'Composer Lint');

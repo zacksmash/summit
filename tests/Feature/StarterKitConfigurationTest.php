@@ -198,6 +198,12 @@ test('installs Playwright browsers in the installer flow when browser testing is
         ->toContain("chiselRun(['npx', 'playwright', 'install'], 'Install Playwright Browsers')");
 });
 
+test('runs Artisan in the installer flow with the current PHP binary', function () {
+    expect(file_get_contents(dirname(__DIR__, 2).'/chisel.php'))
+        ->not->toContain("chiselRun(['php',")
+        ->toContain("chiselRun([PHP_BINARY, 'artisan', 'migrate:fresh', '--force', '--no-interaction'], 'Rebuild Database Schema')");
+});
+
 test('runs feature selection after the other post-update scripts', function () {
     $composer = json_decode(
         file_get_contents(dirname(__DIR__, 2).'/composer.json'),
