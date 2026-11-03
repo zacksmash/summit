@@ -115,7 +115,7 @@ function chiselSelected(array $answers, string $question, string $option): bool
 
 /**
  * Framework-specific filenames are supplied by the sibling chisel-paths.php
- * that ships with each Inertia kit (React/Svelte/Vue). After build both files
+ * that ships with each Inertia kit (React/Svelte/Vue). After build, both files
  * land in the project root.
  *
  * @var array{
@@ -757,7 +757,8 @@ return Chisel::script(__DIR__)
         }
 
         chiselRun(['composer', 'lint'], 'Composer Lint');
-        chiselRun(['php', 'artisan', 'wayfinder:generate', '--with-form', '--no-interaction'], 'Generate Wayfinder Resources');
+        // Use the same PHP executable as Artisan when Windows has multiple installations on PATH.
+        chiselRun([PHP_BINARY, 'artisan', 'wayfinder:generate', '--with-form', '--no-interaction'], 'Generate Wayfinder Resources');
 
         if (! chiselSkipsNode()) {
             if (chiselSelected($answers, 'development_features', 'browser-testing')) {
