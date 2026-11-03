@@ -32,6 +32,24 @@ test('teams can be created', function () {
     ]);
 });
 
+test('personal team returns the team owned by the user', function () {
+    $otherUser = User::factory()->create();
+    $user = User::factory()->make();
+    $user->save();
+
+    $otherUser->personalTeam()->members()->attach($user, [
+        'role' => TeamRole::Member->value,
+    ]);
+
+    $personalTeam = Team::factory()->personal()->create();
+    $personalTeam->members()->attach($user, [
+        'role' => TeamRole::Owner->value,
+    ]);
+
+    expect($user->personalTeam())->toBeInstanceOf(Team::class)
+        ->and($user->personalTeam()->is($personalTeam))->toBeTrue();
+});
+
 test('team slug uses next available suffix', function () {
     $user = User::factory()->create();
 
