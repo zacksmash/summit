@@ -81,7 +81,7 @@ const handleCancel = () => {
                 v-model="name"
                 placeholder="e.g., MacBook Pro, iPhone"
                 class="border-foreground/20 mt-1 block w-full"
-                autofocus
+                v-focus
             />
             <p class="text-muted-foreground text-xs">
                 A name helps you identify this passkey later.
