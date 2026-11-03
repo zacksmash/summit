@@ -12,6 +12,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useSidebar } from '@/components/ui/sidebar';
 import { switchMethod } from '@/routes/teams';
 import type { Team } from '@/types';
 
@@ -25,6 +26,10 @@ const props = withDefaults(
 );
 
 const page = usePage();
+/**
+ * The switcher is also rendered in the header layout, which has no sidebar.
+ */
+const sidebar = useSidebar(null);
 const isMobile = ref(false);
 let mediaQuery: MediaQueryList | null = null;
 const updateIsMobile = () => {
@@ -50,6 +55,8 @@ const plusIconClass = computed(() => (props.inHeader ? 'size-4' : 'h-4 w-4'));
 
 const switchTeam = (team: Team) => {
     const previousTeamSlug = currentTeam.value?.slug;
+
+    sidebar?.setOpenMobile(false);
 
     router.visit(switchMethod(team.slug), {
         onFinish: () => {

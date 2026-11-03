@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from '@lucide/vue';
-import { computed } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
@@ -52,6 +52,15 @@ const props = withDefaults(defineProps<Props>(), {
 const page = usePage();
 const auth = computed(() => page.props.auth);
 const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
+const isMobileMenuOpen = ref(false);
+
+/**
+ * The layout persists between visits, so the mobile menu would stay open
+ * after tapping a link. Close it once the new page has loaded. Links in the
+ * menu also close it on click, since a visit to the current URL replaces
+ * history and does not fire `navigate`.
+ */
+onUnmounted(router.on('navigate', () => (isMobileMenuOpen.value = false)));
 
 const dashboardUrl = computed(() =>
     page.props.currentTeam ? dashboard(page.props.currentTeam.slug).url : '/',
@@ -88,7 +97,7 @@ const rightNavItems: NavItem[] = [
             <div class="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                 <!-- Mobile Menu -->
                 <div class="lg:hidden">
-                    <Sheet>
+                    <Sheet v-model:open="isMobileMenuOpen">
                         <SheetTrigger :as-child="true">
                             <Button
                                 variant="ghost"
@@ -116,6 +125,7 @@ const rightNavItems: NavItem[] = [
                                         :key="item.title"
                                         :href="item.href"
                                         class="hover:bg-accent flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium"
+                                        @click="isMobileMenuOpen = false"
                                         :class="
                                             whenCurrentUrl(
                                                 item.href,

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import { BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';
-import { computed } from 'vue';
+import { computed, onUnmounted } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -17,6 +17,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
@@ -24,6 +25,16 @@ import type { NavItem } from '@/types';
 /* @chisel-teams */
 const page = usePage();
 /* @end-chisel-teams */
+
+const { setOpenMobile } = useSidebar();
+
+/**
+ * The layout persists between visits, so the mobile sidebar would stay open
+ * after tapping a link. Close it once the new page has loaded. Links in the
+ * sidebar also close it on click, since a visit to the current URL replaces
+ * history and does not fire `navigate`.
+ */
+onUnmounted(router.on('navigate', () => setOpenMobile(false)));
 
 const dashboardUrl = computed(() =>
     page.props.currentTeam ? dashboard(page.props.currentTeam.slug).url : '/',
@@ -57,7 +68,10 @@ const footerNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboardUrl">
+                        <Link
+                            :href="dashboardUrl"
+                            @click="setOpenMobile(false)"
+                        >
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>

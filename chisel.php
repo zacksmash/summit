@@ -476,7 +476,7 @@ return Chisel::script(__DIR__)
             }
 
             $c->file('resources/js/components/AppSidebar.vue')
-                ->replace("import { Link, usePage } from '@inertiajs/vue3';", "import { Link } from '@inertiajs/vue3';");
+                ->replace("import { Link, router, usePage } from '@inertiajs/vue3';", "import { Link, router } from '@inertiajs/vue3';");
 
             $c->file('resources/js/pages/Welcome.vue')
                 ->replace("import { Head, Link, usePage } from '@inertiajs/vue3';", "import { Head, Link } from '@inertiajs/vue3';");
