@@ -94,7 +94,7 @@ export default defineConfig({
         ],
         sortTailwindcss: {
             functions: ['clsx', 'cn', 'cva'],
-            entryPoint: 'resources/css/app.css',
+            stylesheet: 'resources/css/app.css',
         },
     },
 });
