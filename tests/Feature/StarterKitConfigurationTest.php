@@ -68,12 +68,12 @@ test('uses Vite Plus for frontend development and code quality', function () {
         'types:check' => 'vue-tsc --noEmit',
     ])->and($package['devDependencies'])
         ->toHaveKey('fontaine', '^0.8.2')
-        ->toHaveKey('vite-plus', '1.3.0')
-        ->toHaveKey('vite', 'npm:@voidzero-dev/vite-plus-core@1.3.0')
+        ->toHaveKey('vite-plus', '1.4.0')
+        ->toHaveKey('vite', 'npm:@voidzero-dev/vite-plus-core@1.4.0')
         ->not->toHaveKey('oxfmt')
         ->not->toHaveKey('oxlint')
         ->not->toHaveKey('oxlint-tsgolint')
-        ->and($package['overrides'])->toBe(['vite' => 'npm:@voidzero-dev/vite-plus-core@1.3.0'])
+        ->and($package['overrides'])->toBe(['vite' => 'npm:@voidzero-dev/vite-plus-core@1.4.0'])
         ->and($composer['scripts']['ci:check'])->toBe([
             'Composer\\Config::disableProcessTimeout',
             'npm run check',
@@ -86,7 +86,7 @@ test('uses Vite Plus for frontend development and code quality', function () {
         ->toContain('plugins: lazyPlugins(() => [')
         ->toContain('denyWarnings: true')
         ->toContain('typeAware: true')
-        ->toContain("entryPoint: 'resources/css/app.css'")
+        ->toContain("stylesheet: 'resources/css/app.css'")
         ->toContain("'resources/js/components/ai-elements/*'")
         ->not->toContain('optimizedFallbacks: false')
         ->and($chisel)
@@ -196,6 +196,12 @@ test('keeps personal tunneling tooling out of the template', function () {
 test('installs Playwright browsers in the installer flow when browser testing is kept', function () {
     expect(file_get_contents(dirname(__DIR__, 2).'/chisel.php'))
         ->toContain("chiselRun(['npx', 'playwright', 'install'], 'Install Playwright Browsers')");
+});
+
+test('runs Artisan in the installer flow with the current PHP binary', function () {
+    expect(file_get_contents(dirname(__DIR__, 2).'/chisel.php'))
+        ->not->toContain("chiselRun(['php',")
+        ->toContain("chiselRun([PHP_BINARY, 'artisan', 'migrate:fresh', '--force', '--no-interaction'], 'Rebuild Database Schema')");
 });
 
 test('runs feature selection after the other post-update scripts', function () {

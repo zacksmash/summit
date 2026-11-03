@@ -40,13 +40,13 @@ const showAvatar = computed(
     <div class="grid flex-1 text-left text-sm leading-tight">
         <span class="truncate font-medium">{{ user.name }}</span>
         <!-- @chisel-teams -->
-        <span v-if="team" class="text-muted-foreground truncate text-xs">{{
+        <span v-if="team" class="truncate text-xs text-muted-foreground">{{
             team.name
         }}</span>
         <!-- @end-chisel-teams -->
         <span
             v-else-if="showEmail"
-            class="text-muted-foreground truncate text-xs"
+            class="truncate text-xs text-muted-foreground"
             >{{ user.email }}</span
         >
     </div>

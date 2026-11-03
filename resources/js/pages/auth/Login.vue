@@ -79,7 +79,7 @@ defineProps<{
                     type="email"
                     name="email"
                     required
-                    autofocus
+                    v-focus
                     :tabindex="1"
                     autocomplete="email"
                     placeholder="email@example.com"
@@ -132,7 +132,7 @@ defineProps<{
         </div>
 
         <!-- @chisel-registration -->
-        <div class="text-muted-foreground text-center text-sm">
+        <div class="text-center text-sm text-muted-foreground">
             Don't have an account?
             <TextLink
                 :href="
