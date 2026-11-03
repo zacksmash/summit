@@ -16,8 +16,8 @@ as_root() {
   fi
 }
 
-step "PHP 8.4 (sury.org) and Composer"
-if command -v php >/dev/null 2>&1 && php -r 'exit(version_compare(PHP_VERSION, "8.4", ">=") ? 0 : 1);'; then
+step "PHP 8.5 (sury.org) and Composer"
+if command -v php >/dev/null 2>&1 && php -r 'exit(version_compare(PHP_VERSION, "8.5", ">=") ? 0 : 1);'; then
   echo "php $(php -r 'echo PHP_VERSION;') already present, skipping apt install"
 else
   as_root apt-get update -qq
@@ -30,8 +30,8 @@ else
     as_root apt-get update -qq
   fi
   as_root apt-get install -y -qq --no-install-recommends \
-    php8.4-cli php8.4-sqlite3 php8.4-xml php8.4-curl php8.4-mbstring \
-    php8.4-zip php8.4-intl php8.4-gd php8.4-bcmath php8.4-bz2 unzip
+    php8.5-cli php8.5-sqlite3 php8.5-xml php8.5-curl php8.5-mbstring \
+    php8.5-zip php8.5-intl php8.5-gd php8.5-bcmath php8.5-bz2 unzip
   echo "installed php $(php -r 'echo PHP_VERSION;')"
 fi
 
@@ -83,7 +83,7 @@ if ! grep -Fqx "$profile_marker" "$HOME/.config/amp/AGENTS.md" 2>/dev/null; then
   cat >> "$HOME/.config/amp/AGENTS.md" <<EOF
 
 $profile_marker
-- PHP 8.4+ (sury.org), Composer, Node, and pnpm are preinstalled by .agents/setup.
+- PHP 8.5+ (sury.org), Composer, Node, and pnpm are preinstalled by .agents/setup.
 - The .env file, APP_KEY, Passport keys, and the seeded SQLite database were created by .agents/setup.
 - Run frontend commands with pnpm (pnpm-workspace.yaml), not npm.
 EOF
