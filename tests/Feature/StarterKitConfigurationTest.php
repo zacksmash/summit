@@ -86,7 +86,7 @@ test('uses Vite Plus for frontend development and code quality', function () {
         ->toContain('plugins: lazyPlugins(() => [')
         ->toContain('denyWarnings: true')
         ->toContain('typeAware: true')
-        ->toContain("entryPoint: 'resources/css/app.css'")
+        ->toContain("stylesheet: 'resources/css/app.css'")
         ->toContain("'resources/js/components/ai-elements/*'")
         ->not->toContain('optimizedFallbacks: false')
         ->and($chisel)
