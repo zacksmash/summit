@@ -28,6 +28,7 @@ class Membership extends Pivot
      *
      * @var bool
      */
+    #[\Override]
     public $incrementing = true;
 
     /**

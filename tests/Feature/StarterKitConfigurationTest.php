@@ -108,7 +108,7 @@ test('runs the consolidated Laravel CI workflow across supported PHP versions', 
         ->toContain('actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1')
         ->toContain('shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2')
         ->toContain('actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0')
-        ->toContain("php-version: ['8.4', '8.5']")
+        ->toContain("php-version: ['8.5']")
         ->toContain('coverage: none')
         ->toContain('run: composer setup')
         ->toContain('run: npx playwright install --with-deps')
