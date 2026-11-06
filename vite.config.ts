@@ -5,9 +5,11 @@ import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
 import { defineConfig, lazyPlugins } from 'vite-plus';
+import vhosty from '@vhosty/vite-plugin';
 
 export default defineConfig({
     plugins: lazyPlugins(() => [
+        vhosty(),
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.ts'],
             refresh: true,
